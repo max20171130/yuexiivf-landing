@@ -551,26 +551,14 @@
     }
     const delay = ms => new Promise(r => setTimeout(r, ms));
 
-    async function playChat() {
-      for (let i = 0; i < messages.length; i++) {
-        const m = messages[i];
-        showTyping();
-        const len = m.replace(/<[^>]+>/g, '').length;
-        const typingTime = Math.min(2400, Math.max(900, len * 45));
-        await delay(typingTime);
-        removeTyping();
-        appendBubble(m);
-        await delay(500);
-      }
-      // 消息播完，显示问卷
+    function playChat() {
+      // 所有消息一次性渲染，无缓冲
+      messages.forEach(m => appendBubble(m));
+      // 立即显示问卷
       quizArea.classList.add('show');
-      // 自动滚到问卷
-      setTimeout(() => {
-        quizArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
     }
 
-    window.addEventListener('load', () => setTimeout(playChat, 400));
+    window.addEventListener('load', playChat);
 
     // ============ Chip 单选 + 逐题展示 ============
     const answers = {};
