@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>悦喜汇 · 18年辅助生殖咨询师 — 一对一在线分析</title>
+
+  <!-- Google Ads + GA4 转化追踪 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18163080541"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18163080541');
+    gtag('config', 'G-PJ0KE3HLJF');
+  </script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
@@ -548,13 +558,45 @@
 
     function submitQuiz() {
       const contact = document.getElementById('contactInput').value.trim();
-      const data = { ...answers, contact };
-      console.log('问卷提交', data);
-      // gtag 转化追踪埋点
+      const payload = {
+        '性别身份': answers.gender || '',
+        '年龄': answers.age || '',
+        '预算': answers.budget || '',
+        '是否需要供卵': answers.egg || '',
+        '倾向国家': answers.country || '',
+        '希望多久抱娃': answers.timing || '',
+        '联系方式': contact || '（未填）',
+        '_subject': '【悦喜汇】聊天落地页新留资 — ' + (answers.country || '未知国家'),
+        '_template': 'table',
+        '_captcha': 'false'
+      };
+
+      // 1) 发邮件到 Prop65@gallc.org (FormSubmit.co)
+      fetch('https://formsubmit.co/ajax/Prop65@gallc.org', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.json())
+        .then(d => console.log('邮件已发送', d))
+        .catch(e => console.error('FormSubmit error', e));
+
+      // 2) Google Ads + GA4 转化追踪
+      const txnId = 'lp_chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
       if (window.gtag) {
-        gtag('event', 'conversion', { send_to: 'YOUR_CONVERSION_ID' });
+        gtag('event', 'generate_lead', {
+          event_category: 'form',
+          event_label: 'chat_landing',
+          transaction_id: txnId
+        });
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0,
+          'currency': 'USD',
+          'transaction_id': txnId
+        });
       }
-      // TODO: 接后端 - 这里把 data 发到你的服务器/邮箱/CRM
+
+      console.log('问卷提交', payload, 'txnId=' + txnId);
       showToast('已提交，顾问会在 5 分钟内联系你');
       document.getElementById('submitQuiz').disabled = true;
       document.getElementById('submitQuiz').textContent = '✓ 已提交，请等待回复';
@@ -564,18 +606,33 @@
       quizArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ============ 加微信（复制+唤起微信APP） ============
+    // ============ 加微信（复制+唤起微信APP+转化追踪） ============
     function addWechat() {
       const wxid = 'ATR20188';
       // 先复制
       copyText(wxid, '微信号 ATR20188 已复制 → 粘贴到搜索框加好友');
+
+      // 触发 Google Ads 转化（加微信意向）
+      const txnId = 'lp_chat_wx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      if (window.gtag) {
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0,
+          'currency': 'USD',
+          'transaction_id': txnId
+        });
+        gtag('event', 'wechat_copy', {
+          event_category: 'engagement',
+          event_label: 'chat_landing',
+          transaction_id: txnId
+        });
+      }
+
       // 检测设备
       const ua = navigator.userAgent;
       const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
       if (isMobile) {
-        // 延迟 800ms 唤起微信，让用户先看到 toast
         setTimeout(() => {
-          // 用隐藏 iframe 触发 weixin:// scheme，避免 location.href 跳走丢失页面
           const iframe = document.createElement('iframe');
           iframe.style.display = 'none';
           iframe.src = 'weixin://';
