@@ -441,7 +441,7 @@
         <input class="age-input" id="contactInput" style="max-width: none;" placeholder="微信号 或 电话，方便顾问主动联系你" />
       </div>
 
-      <button class="submit-quiz" id="submitQuiz" disabled onclick="submitQuiz()">让顾问看到我的情况 →</button>
+      <button class="submit-quiz" id="submitQuiz" onclick="submitQuiz()">让顾问看到我的情况 →</button>
       <p style="text-align:center;color:#999;font-size:12px;margin:10px 0 0;">提交即视为同意我们一对一联系你</p>
     </div>
 
@@ -535,7 +535,7 @@
 
     window.addEventListener('load', () => setTimeout(playChat, 400));
 
-    // ============ Chip 单选逻辑 ============
+    // ============ Chip 单选逻辑（全部选填，不强制） ============
     const answers = {};
     document.querySelectorAll('.quiz-q').forEach(q => {
       const qKey = q.dataset.q;
@@ -545,19 +545,21 @@
           q.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
           chip.classList.add('selected');
           answers[qKey] = chip.dataset.v;
-          checkSubmitReady();
         });
       });
     });
 
-    function checkSubmitReady() {
-      const required = ['gender', 'age', 'budget', 'egg', 'country', 'timing'];
-      const allFilled = required.every(k => answers[k]);
-      document.getElementById('submitQuiz').disabled = !allFilled;
-    }
-
     function submitQuiz() {
       const contact = document.getElementById('contactInput').value.trim();
+
+      // 完全空提交时,提示用户至少填联系方式（不强制阻塞）
+      const anyAnswerFilled = Object.keys(answers).length > 0;
+      if (!contact && !anyAnswerFilled) {
+        showToast('至少留个微信号方便顾问联系你 🙏');
+        document.getElementById('contactInput').focus();
+        return;
+      }
+
       const payload = {
         '性别身份': answers.gender || '',
         '年龄': answers.age || '',
