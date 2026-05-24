@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>悦喜汇 · 18年辅助生殖咨询师 — 一对一在线分析</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #ededed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: #222;
+    }
+    .chat-app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #ededed;
+      box-shadow: 0 0 30px rgba(0,0,0,0.08);
+    }
+
+    /* 顶部栏 */
+    .chat-header {
+      background: #1f1f1f;
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #000;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1aad19, #07c160);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+    }
+    .header-info { flex: 1; min-width: 0; }
+    .header-name { font-weight: 600; font-size: 16px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-status {
+      font-size: 12px;
+      color: #9bda9b;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #07c160;
+      box-shadow: 0 0 0 0 rgba(7,193,96,0.6);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(7,193,96,0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(7,193,96,0); }
+      100% { box-shadow: 0 0 0 0 rgba(7,193,96,0); }
+    }
+    /* 顶栏右侧微信按钮 */
+    .header-wechat {
+      background: #07c160;
+      color: #fff;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .header-wechat:active { transform: scale(0.96); }
+    .header-wechat .wx-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* 聊天区 */
+    .chat-body {
+      padding: 18px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .system-time {
+      align-self: center;
+      background: rgba(0,0,0,0.08);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      margin: 6px 0;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: msgIn 0.35s ease forwards;
+    }
+    @keyframes msgIn { to { opacity: 1; transform: translateY(0); } }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, #1aad19, #07c160);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .bubble {
+      background: #fff;
+      padding: 11px 14px;
+      border-radius: 4px;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 78%;
+      position: relative;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+      word-break: break-word;
+    }
+    .bubble::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 12px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 6px solid #fff;
+    }
+    .bubble strong { color: #07c160; }
+    .typing { display: inline-flex; gap: 4px; padding: 12px 14px; }
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #b0b0b0;
+      animation: typingDot 1.2s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* 问卷区 */
+    .quiz-area {
+      background: #ffffff;
+      margin: 10px 14px 16px;
+      padding: 20px 18px 22px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .quiz-area.show { opacity: 1; transform: translateY(0); }
+    .quiz-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      color: #1f1f1f;
+    }
+    .quiz-sub {
+      color: #666;
+      font-size: 13px;
+      margin: 0 0 18px;
+    }
+    .quiz-q {
+      margin-bottom: 18px;
+    }
+    .quiz-q .q-label {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .q-num {
+      background: #07c160;
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      padding: 9px 14px;
+      border: 1.5px solid #e0e0e0;
+      background: #fff;
+      border-radius: 999px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #333;
+      transition: all 0.15s;
+    }
+    .chip:active { transform: scale(0.96); }
+    .chip.selected {
+      background: #07c160;
+      color: #fff;
+      border-color: #07c160;
+    }
+    .age-input {
+      width: 100%;
+      max-width: 200px;
+      padding: 10px 12px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+    .submit-quiz {
+      width: 100%;
+      margin-top: 10px;
+      background: #07c160;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .submit-quiz:disabled {
+      background: #c0c0c0;
+      cursor: not-allowed;
+    }
+    .submit-quiz:active:not(:disabled) { transform: scale(0.98); }
+
+    /* 底部 3 按钮 */
+    .action-bar {
+      background: #f7f7f7;
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: sticky;
+      bottom: 0;
+    }
+    .action-hint {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      padding: 2px 0;
+    }
+    .action-row { display: flex; gap: 8px; }
+    .action-btn {
+      flex: 1;
+      padding: 11px 4px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      transition: transform 0.1s;
+    }
+    .action-btn:active { transform: scale(0.96); }
+    .action-btn .icon { font-size: 18px; line-height: 1; }
+    .btn-wechat { background: #07c160; color: #fff; }
+    .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
+    .btn-form { background: #ff9933; color: #fff; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30%;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 420px) {
+      .chat-app { box-shadow: none; }
+      .bubble { font-size: 15.5px; }
+      .header-wechat .label { display: none; }
+      .header-wechat { padding: 7px 9px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-app">
+
+    <!-- 顶部栏：右侧加了绿色「微信」按钮 -->
+    <div class="chat-header">
+      <div class="header-avatar">悦</div>
+      <div class="header-info">
+        <div class="header-name">悦喜汇 · 辅助生殖咨询师</div>
+        <div class="header-status">
+          <span class="online-dot"></span>
+          <span>在线 · 18年从业经验</span>
+        </div>
+      </div>
+      <button class="header-wechat" onclick="addWechat()">
+        <span class="wx-icon">💬</span>
+        <span class="label">加微信</span>
+      </button>
+    </div>
+
+    <!-- 聊天主体 -->
+    <div class="chat-body" id="chatBody">
+      <div class="system-time">今天</div>
+    </div>
+
+    <!-- 问卷区（消息播完后渐入显示） -->
+    <div class="quiz-area" id="quizArea">
+      <h3 class="quiz-title">先做一个基本情况回复</h3>
+      <p class="quiz-sub">填完顾问会针对你的情况，做一对一深度分析。所有信息严格保密。</p>
+
+      <!-- Q1: 性别 -->
+      <div class="quiz-q" data-q="gender">
+        <div class="q-label"><span class="q-num">1</span> 您的性别 / 身份</div>
+        <div class="chip-row">
+          <button class="chip" data-v="男性">男性</button>
+          <button class="chip" data-v="女性">女性</button>
+          <button class="chip" data-v="夫妻">夫妻</button>
+          <button class="chip" data-v="同性伴侣">同性伴侣</button>
+        </div>
+      </div>
+
+      <!-- Q2: 年龄 -->
+      <div class="quiz-q" data-q="age">
+        <div class="q-label"><span class="q-num">2</span> 您的年龄</div>
+        <div class="chip-row">
+          <button class="chip" data-v="30岁以下">30岁以下</button>
+          <button class="chip" data-v="30-35岁">30-35岁</button>
+          <button class="chip" data-v="35-40岁">35-40岁</button>
+          <button class="chip" data-v="40-45岁">40-45岁</button>
+          <button class="chip" data-v="45岁以上">45岁以上</button>
+        </div>
+      </div>
+
+      <!-- Q3: 预算 -->
+      <div class="quiz-q" data-q="budget">
+        <div class="q-label"><span class="q-num">3</span> 预算范围</div>
+        <div class="chip-row">
+          <button class="chip" data-v="7万美金">7 万美金</button>
+          <button class="chip" data-v="9万美金">9 万美金</button>
+          <button class="chip" data-v="12万美金以上">12 万美金以上</button>
+          <button class="chip" data-v="还在评估">还在评估</button>
+        </div>
+      </div>
+
+      <!-- Q4: 是否需要供卵 -->
+      <div class="quiz-q" data-q="egg">
+        <div class="q-label"><span class="q-num">4</span> 是否需要供卵</div>
+        <div class="chip-row">
+          <button class="chip" data-v="需要亚裔卵源">需要亚裔卵源</button>
+          <button class="chip" data-v="需要欧洲卵源">需要欧洲卵源</button>
+          <button class="chip" data-v="不需要供卵">不需要供卵</button>
+        </div>
+      </div>
+
+      <!-- Q5: 有倾向国家吗 -->
+      <div class="quiz-q" data-q="country">
+        <div class="q-label"><span class="q-num">5</span> 有倾向国家吗</div>
+        <div class="chip-row">
+          <button class="chip" data-v="美国">美国</button>
+          <button class="chip" data-v="格鲁吉亚">格鲁吉亚</button>
+          <button class="chip" data-v="斯坦国(哈萨克/吉尔吉斯)">斯坦国</button>
+          <button class="chip" data-v="中国内地">中国内地</button>
+          <button class="chip" data-v="还在对比">还在对比</button>
+        </div>
+      </div>
+
+      <!-- Q6: 时间预期 -->
+      <div class="quiz-q" data-q="timing">
+        <div class="q-label"><span class="q-num">6</span> 希望多久抱娃</div>
+        <div class="chip-row">
+          <button class="chip" data-v="1-2年内">1-2 年内</button>
+          <button class="chip" data-v="不特别急">不特别急</button>
+        </div>
+      </div>
+
+      <!-- 可选：联系方式 -->
+      <div class="quiz-q" data-q="contact" style="margin-bottom: 6px;">
+        <div class="q-label"><span class="q-num">+</span> 留个联系方式（可选）</div>
+        <input class="age-input" id="contactInput" style="max-width: none;" placeholder="微信号 或 电话，方便顾问主动联系你" />
+      </div>
+
+      <button class="submit-quiz" id="submitQuiz" disabled onclick="submitQuiz()">让顾问看到我的情况 →</button>
+      <p style="text-align:center;color:#999;font-size:12px;margin:10px 0 0;">提交即视为同意我们一对一联系你</p>
+    </div>
+
+    <!-- 底部 3 按钮 -->
+    <div class="action-bar">
+      <div class="action-hint">不想填问卷？点「加微信」会自动打开微信 APP，粘贴搜索即可</div>
+      <div class="action-row">
+        <button class="action-btn btn-wechat" onclick="addWechat()">
+          <span class="icon">💬</span>
+          <span>加微信</span>
+        </button>
+        <button class="action-btn btn-phone" onclick="callPhone('13822192921')">
+          <span class="icon">📞</span>
+          <span>拨打电话</span>
+        </button>
+        <button class="action-btn btn-form" onclick="scrollToQuiz()">
+          <span class="icon">📝</span>
+          <span>填问卷</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">已复制</div>
+
+  <script>
+    /* ============================================================
+       📝 聊天消息内容 — 在这里编辑
+       ============================================================ */
+    const messages = [
+      "你好 👋 我是悦喜汇的辅助生殖咨询师",
+      "从业 <strong>18 年</strong>来，我见过太多家庭，他们都想要一个孩子。但因为对各地政策不了解，或者偏听某些传闻，最后选了不太适合自己的路。<br><br>我已经帮过很多人。<strong>你可以先做一个基本情况回复</strong>，我会针对你的情况，做一对一深入分析 👇"
+    ];
+
+    /* ============================================================ */
+
+    const chatBody = document.getElementById('chatBody');
+    const quizArea = document.getElementById('quizArea');
+
+    function appendBubble(content) {
+      const row = document.createElement('div');
+      row.className = 'msg-row';
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = '悦';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = content;
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatBody.appendChild(row);
+    }
+    function showTyping() {
+      const row = document.createElement('div');
+      row.className = 'msg-row';
+      row.id = 'typingRow';
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = '悦';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatBody.appendChild(row);
+    }
+    function removeTyping() {
+      const t = document.getElementById('typingRow');
+      if (t) t.remove();
+    }
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+
+    async function playChat() {
+      for (let i = 0; i < messages.length; i++) {
+        const m = messages[i];
+        showTyping();
+        const len = m.replace(/<[^>]+>/g, '').length;
+        const typingTime = Math.min(2400, Math.max(900, len * 45));
+        await delay(typingTime);
+        removeTyping();
+        appendBubble(m);
+        await delay(500);
+      }
+      // 消息播完，显示问卷
+      quizArea.classList.add('show');
+      // 自动滚到问卷
+      setTimeout(() => {
+        quizArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+
+    window.addEventListener('load', () => setTimeout(playChat, 400));
+
+    // ============ Chip 单选逻辑 ============
+    const answers = {};
+    document.querySelectorAll('.quiz-q').forEach(q => {
+      const qKey = q.dataset.q;
+      if (!qKey || qKey === 'contact') return;
+      q.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          q.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+          answers[qKey] = chip.dataset.v;
+          checkSubmitReady();
+        });
+      });
+    });
+
+    function checkSubmitReady() {
+      const required = ['gender', 'age', 'budget', 'egg', 'country', 'timing'];
+      const allFilled = required.every(k => answers[k]);
+      document.getElementById('submitQuiz').disabled = !allFilled;
+    }
+
+    function submitQuiz() {
+      const contact = document.getElementById('contactInput').value.trim();
+      const data = { ...answers, contact };
+      console.log('问卷提交', data);
+      // gtag 转化追踪埋点
+      if (window.gtag) {
+        gtag('event', 'conversion', { send_to: 'YOUR_CONVERSION_ID' });
+      }
+      // TODO: 接后端 - 这里把 data 发到你的服务器/邮箱/CRM
+      showToast('已提交，顾问会在 5 分钟内联系你');
+      document.getElementById('submitQuiz').disabled = true;
+      document.getElementById('submitQuiz').textContent = '✓ 已提交，请等待回复';
+    }
+
+    function scrollToQuiz() {
+      quizArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============ 加微信（复制+唤起微信APP） ============
+    function addWechat() {
+      const wxid = 'ATR20188';
+      // 先复制
+      copyText(wxid, '微信号 ATR20188 已复制 → 粘贴到搜索框加好友');
+      // 检测设备
+      const ua = navigator.userAgent;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+      if (isMobile) {
+        // 延迟 800ms 唤起微信，让用户先看到 toast
+        setTimeout(() => {
+          // 用隐藏 iframe 触发 weixin:// scheme，避免 location.href 跳走丢失页面
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = 'weixin://';
+          document.body.appendChild(iframe);
+          setTimeout(() => iframe.remove(), 1000);
+        }, 800);
+      }
+    }
+
+    // ============ 拨打电话 ============
+    function callPhone(num) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = 'tel:' + num;
+      } else {
+        // 桌面端复制电话
+        copyText('138 2219 2921', '电话 138 2219 2921 已复制');
+      }
+    }
+
+    // ============ 复制 + Toast ============
+    function copyText(text, message) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(message)).catch(() => fallbackCopy(text, message));
+      } else { fallbackCopy(text, message); }
+    }
+    function fallbackCopy(text, message) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast(message); } catch(e) { showToast('复制失败,请手动复制'); }
+      document.body.removeChild(ta);
+    }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>
