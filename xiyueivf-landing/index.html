@@ -492,6 +492,25 @@
       font-size: 13px;
       cursor: pointer;
     }
+    /* 挽留问题按钮 */
+    .qm-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: #f0f5ff;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: #333;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .qm-btn:active { background: #d6e6ff; transform: scale(0.98); }
+    .qm-btn::after { content: "›"; font-size: 20px; color: #999; }
 
     @media (max-width: 420px) {
       .chat-app { box-shadow: none; }
@@ -621,6 +640,21 @@
           <span class="icon">📝</span>
           <span>获取代孕方案</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 退出挽留 Modal -->
+  <div class="contact-modal-overlay" id="exitModal" onclick="if(event.target===this)closeExitModal()">
+    <div class="contact-modal-card">
+      <button class="contact-modal-close" onclick="closeExitModal()">×</button>
+      <div class="contact-modal-title">您可能还想问这些问题</div>
+      <button class="qm-btn" onclick="askExit('cheapest')">💰 哪个国家代孕最便宜?</button>
+      <button class="qm-btn" onclick="askExit('fastest')">⏰ 哪个国家代孕最快?</button>
+      <button class="qm-btn" onclick="askExit('value')">⚖️ 哪个国家性价比最高?</button>
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button onclick="confirmExit()" style="flex:1; padding:12px; border:none; border-radius:999px; font-size:14.5px; font-weight:700; cursor:pointer; background:#f0f0f0; color:#999;">离开</button>
+        <button onclick="closeExitModal()" style="flex:1; padding:12px; border:none; border-radius:999px; font-size:14.5px; font-weight:700; cursor:pointer; background:#07c160; color:#fff; box-shadow:0 2px 8px rgba(7,193,96,0.4);">再聊聊</button>
       </div>
     </div>
   </div>
@@ -843,7 +877,14 @@
     }
 
     // ============ 「获取代孕方案」按钮 — 弹留资 Modal ============
-    function openContactModal() {
+    let pendingExitKey = null;  // 记录从哪个挽留问题来,提交时附带
+    function openContactModal(customSubtitle) {
+      const subEl = document.querySelector('#contactModal .contact-modal-sub');
+      if (customSubtitle && subEl) {
+        subEl.innerHTML = customSubtitle;
+      } else if (subEl) {
+        subEl.innerHTML = '留下您的微信号或电话<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估';
+      }
       document.getElementById('contactModal').classList.add('show');
       setTimeout(() => document.getElementById('contactModalInput').focus(), 200);
     }
@@ -858,16 +899,23 @@
         return;
       }
       // 走跟问卷一样的提交逻辑(Web3Forms 邮件 + Google Ads 转化)
+      const exitInfo = exitPending && exitAnswers[exitPending]
+        ? '⚠️ 从退出挽留 ' + exitAnswers[exitPending].label + ' 问题来\n' +
+          '建议回复内容: ' + exitAnswers[exitPending].detail + '\n\n'
+        : '';
+      const sourceLabel = exitPending ? '获取代孕方案 · 退出挽留 [' + exitPending + ']' : '获取代孕方案弹窗';
       const fd = new FormData();
       fd.append('access_key', '2c1aeba8-e386-4089-81a4-a9532238f9f3');
-      fd.append('subject', '🎯【悦喜汇】快捷留资 — ' + contact.slice(0, 30));
+      fd.append('subject', '🎯【悦喜汇】' + (exitPending ? '挽留留资' : '快捷留资') + ' — ' + contact.slice(0, 30));
       fd.append('from_name', '悦喜汇 yuexiivf-landing.vercel.app (modal)');
       fd.append('message',
+        exitInfo +
         '📞 联系方式: ' + contact + '\n' +
-        '🌐 来源: yuexiivf-landing.vercel.app · 获取代孕方案弹窗\n' +
+        '🌐 来源: yuexiivf-landing.vercel.app · ' + sourceLabel + '\n' +
         '⏰ 时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }) + '\n' +
         '🖥️ 设备: ' + navigator.userAgent.slice(0, 80)
       );
+      exitPending = null;
       fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
         .catch(e => console.error('Web3Forms error', e));
 
@@ -891,6 +939,53 @@
       if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitContactModal(); });
     });
 
+    // ============ 退出挽留弹窗(只弹一次) ============
+    const exitAnswers = {
+      cheapest: { label: '【最便宜国家】', detail: '国内 9 万 / 哈萨克 8-10 万 / 格鲁吉亚 10-12 万 / 美国 18-22 万' },
+      fastest:  { label: '【最快国家】',   detail: '国内最快 13 个月 / 哈萨克 14-16 / 格鲁吉亚 15-17 / 美国 14-18' },
+      value:    { label: '【性价比最高】', detail: '综合价格+时间+合规+成功率,国内方案性价比第一' }
+    };
+    let exitModalShownEver = false;
+    let userConfirmedExit = false;
+    let exitPending = null;
+
+    history.pushState({page: 'lp'}, '', location.href);
+    window.addEventListener('popstate', () => {
+      if (userConfirmedExit) return;
+      if (exitModalShownEver) { userConfirmedExit = true; return; }
+      showExitModal();
+      history.pushState({page: 'lp'}, '', location.href);
+    });
+    window.addEventListener('beforeunload', e => {
+      if (!userConfirmedExit) { e.preventDefault(); e.returnValue = ''; return ''; }
+    });
+
+    function showExitModal() {
+      document.getElementById('exitModal').classList.add('show');
+      exitModalShownEver = true;
+      if (window.gtag) gtag('event', 'exit_intent', { event_category: 'lp' });
+    }
+    function closeExitModal() {
+      document.getElementById('exitModal').classList.remove('show');
+    }
+    function confirmExit() {
+      userConfirmedExit = true;
+      closeExitModal();
+      history.back();
+    }
+    function askExit(key) {
+      const data = exitAnswers[key];
+      if (!data) return;
+      closeExitModal();
+      exitPending = key;
+      // 立即弹留资框,副标题动态变成对应问题
+      openContactModal(
+        '✨ Mandy 已为您准备 <strong>' + data.label + '</strong> 的详细分析<br>' +
+        '留下微信/电话,立刻发您 + 免费方案评估'
+      );
+      if (window.gtag) gtag('event', 'exit_question', { event_category: 'lp', event_label: key });
+    }
+
     // ============ 加微信（复制+唤起微信APP+转化追踪） ============
     function addWechat() {
       const wxid = 'ATR20188';
@@ -913,18 +1008,21 @@
         });
       }
 
-      // 检测设备
-      const ua = navigator.userAgent;
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
-      if (isMobile) {
+      // 自动唤起微信 APP — 多重方法保证成功率
+      setTimeout(() => {
+        // 方法 1: window.location 直接跳转(iOS Safari/Chrome 最可靠)
+        try { window.location.href = 'weixin://'; } catch(e) {}
+        // 方法 2: 隐藏 iframe 兜底(Android/旧浏览器)
         setTimeout(() => {
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = 'weixin://';
-          document.body.appendChild(iframe);
-          setTimeout(() => iframe.remove(), 1000);
-        }, 800);
-      }
+          try {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'weixin://';
+            document.body.appendChild(iframe);
+            setTimeout(() => iframe.remove(), 1000);
+          } catch(e) {}
+        }, 100);
+      }, 500);
     }
 
     // ============ 拨打电话 ============
