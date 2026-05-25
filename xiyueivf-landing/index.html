@@ -623,6 +623,38 @@
         return;
       }
 
+      // 1) 发邮件 (Web3Forms — 与 yuexihui.org/consult.html 共用 access_key,已激活)
+      // 用英文字段名避免邮件里中文乱码
+      const fd = new FormData();
+      fd.append('access_key', '2c1aeba8-e386-4089-81a4-a9532238f9f3');
+      fd.append('subject', '【悦喜汇】聊天落地页新留资 — ' + (answers.country || '未知国家'));
+      fd.append('from_name', '悦喜汇 yuexiivf-landing.vercel.app');
+      fd.append('redirect', 'false');
+      fd.append('botcheck', '');
+      fd.append('gender', answers.gender || '');
+      fd.append('age', answers.age || '');
+      fd.append('budget', answers.budget || '');
+      fd.append('egg_donor', answers.egg || '');
+      fd.append('country', answers.country || '');
+      fd.append('timing', answers.timing || '');
+      fd.append('contact', contact || '(未填)');
+      fd.append('landing_page', 'yuexiivf-landing.vercel.app (chat)');
+      // 整段中文摘要,确保邮件正文有可读内容
+      fd.append('message',
+        '性别身份: ' + (answers.gender || '-') + '\n' +
+        '年龄: ' + (answers.age || '-') + '\n' +
+        '预算: ' + (answers.budget || '-') + '\n' +
+        '是否需要供卵: ' + (answers.egg || '-') + '\n' +
+        '倾向国家: ' + (answers.country || '-') + '\n' +
+        '希望多久抱娃: ' + (answers.timing || '-') + '\n' +
+        '联系方式: ' + (contact || '(未填)')
+      );
+
+      fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => console.log('Web3Forms 响应', d))
+        .catch(e => console.error('Web3Forms error', e));
+
       const payload = {
         '性别身份': answers.gender || '',
         '年龄': answers.age || '',
@@ -630,20 +662,8 @@
         '是否需要供卵': answers.egg || '',
         '倾向国家': answers.country || '',
         '希望多久抱娃': answers.timing || '',
-        '联系方式': contact || '（未填）',
-        '_subject': '【悦喜汇】聊天落地页新留资 — ' + (answers.country || '未知国家'),
-        '_template': 'table',
-        '_captcha': 'false'
+        '联系方式': contact || '（未填）'
       };
-
-      // 1) 发邮件到 Prop65@gallc.org (FormSubmit.co)
-      fetch('https://formsubmit.co/ajax/Prop65@gallc.org', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(r => r.json())
-        .then(d => console.log('邮件已发送', d))
-        .catch(e => console.error('FormSubmit error', e));
 
       // 2) Google Ads + GA4 转化追踪
       const txnId = 'lp_chat_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
