@@ -949,15 +949,66 @@
     let userConfirmedExit = false;
     let exitPending = null;
 
-    history.pushState({page: 'lp'}, '', location.href);
+    // ===== 多重退出检测 — 任一触发都弹挽留窗(整会话只弹一次)=====
+    // 冷启动保护:页面加载后头 5 秒,任何检测都不弹(防误触)
+    let exitDetectionReady = false;
+    setTimeout(() => { exitDetectionReady = true; }, 5000);
+    // 清掉旧的 sessionStorage 残留,避免上次浏览的状态触发
+    sessionStorage.removeItem('mayLeave');
+
+    function tryShowExitModal(reason) {
+      if (!exitDetectionReady) {
+        console.log('[exit-intent ignored - cold start]', reason);
+        return;
+      }
+      if (exitModalShownEver || userConfirmedExit) return;
+      console.log('[exit-intent]', reason);
+      showExitModal();
+    }
+
+    // 检测 1: popstate (浏览器返回键)
+    window.addEventListener('load', () => {
+      history.pushState({page: 'lp'}, '', location.href);
+    });
     window.addEventListener('popstate', () => {
       if (userConfirmedExit) return;
       if (exitModalShownEver) { userConfirmedExit = true; return; }
-      showExitModal();
+      tryShowExitModal('popstate');
       history.pushState({page: 'lp'}, '', location.href);
     });
+
+    // 检测 2: beforeunload (桌面关闭/刷新)
     window.addEventListener('beforeunload', e => {
       if (!userConfirmedExit) { e.preventDefault(); e.returnValue = ''; return ''; }
+    });
+
+    // 检测 3: visibilitychange (要求"消失 >2 秒"才算真正离开)
+    let hiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAt = Date.now();
+      } else if (document.visibilityState === 'visible' && hiddenAt > 0) {
+        const awayMs = Date.now() - hiddenAt;
+        hiddenAt = 0;
+        // 消失超过 2 秒才算真正切走过
+        if (awayMs > 2000) tryShowExitModal('returnFromHidden(' + awayMs + 'ms)');
+      }
+    });
+
+    // 检测 4: mouseleave (桌面端鼠标移向顶部地址栏)
+    document.addEventListener('mouseleave', e => {
+      if (e.clientY <= 0) tryShowExitModal('mouseleave-top');
+    });
+
+    // 检测 5: 45 秒无互动定时器(兜底)
+    let idleTimer = setTimeout(() => tryShowExitModal('idle-45s'), 45000);
+    ['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
+      document.addEventListener(ev, () => {
+        clearTimeout(idleTimer);
+        if (!exitModalShownEver) {
+          idleTimer = setTimeout(() => tryShowExitModal('idle-after-engage-60s'), 60000);
+        }
+      }, { passive: true });
     });
 
     function showExitModal() {
