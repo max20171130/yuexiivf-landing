@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>悦喜汇 · 18年辅助生育咨询师 — 在线咨询</title>
+
+  <!-- Google Ads + GA4 转化追踪 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18163080541"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18163080541');
+    gtag('config', 'G-PJ0KE3HLJF');
+
+    function fireConversion(label) {
+      const txnId = 'lp_tawk_' + label + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      if (window.gtag) {
+        gtag('event', 'engaged_chat', { event_category: 'chat', event_label: label, transaction_id: txnId });
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
+        });
+      }
+    }
+
+    // 兜底：30 秒还在页面上 = 强意向
+    setTimeout(() => fireConversion('stayed_30s'), 30000);
+  </script>
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      overflow: hidden;
+      background: #07c160;
+    }
+
+    /* 顶栏 */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #1f1f1f;
+      color: #fff;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 56px;
+      z-index: 2147483647;
+    }
+    .topbar-avatar {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1aad19, #07c160);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 17px; color: #fff;
+    }
+    .topbar-info { flex: 1; min-width: 0; }
+    .topbar-name { font-weight: 600; font-size: 14px; line-height: 1.2; }
+    .topbar-status {
+      font-size: 11px;
+      color: #9bda9b;
+      margin-top: 2px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .online-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #07c160;
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(7,193,96,0.55); }
+      50% { box-shadow: 0 0 0 6px rgba(7,193,96,0); }
+    }
+    .topbar-wechat {
+      background: #07c160;
+      color: #fff;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      flex-shrink: 0;
+    }
+    .topbar-wechat:active { transform: scale(0.96); }
+
+    /* 全屏加载遮罩 (绿色背景, 跟 Tawk 主题色统一) */
+    .loading-mask {
+      position: fixed;
+      top: 56px; left: 0; right: 0; bottom: 0;
+      background: #07c160;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.5s ease;
+      z-index: 50;
+    }
+    .loading-mask.hidden { opacity: 0; pointer-events: none; }
+    .loading-spinner {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #fff; font-size: 14px; font-weight: 500; opacity: 0.95; }
+    .loading-sub { color: #fff; font-size: 12px; opacity: 0.75; margin-top: -8px; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24%;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 把 Tawk 浮窗强制改成全屏(在顶栏下方) */
+    iframe[title*="chat" i],
+    iframe[id*="tawk" i],
+    #tawkchat-container,
+    .tawk-chat-panel {
+      position: fixed !important;
+      top: 56px !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: calc(100vh - 56px) !important;
+      max-width: 100vw !important;
+      max-height: calc(100vh - 56px) !important;
+      border-radius: 0 !important;
+      z-index: 100 !important;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <div class="topbar-avatar">悦</div>
+    <div class="topbar-info">
+      <div class="topbar-name">悦喜汇 · 辅助生育咨询</div>
+      <div class="topbar-status">
+        <span class="online-dot"></span>
+        <span>在线 · 18年从业</span>
+      </div>
+    </div>
+    <button class="topbar-wechat" onclick="addWechat()">💬 加微信</button>
+  </div>
+
+  <!-- 加载遮罩 -->
+  <div class="loading-mask" id="loadingMask">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">正在为你接通顾问...</div>
+    <div class="loading-sub">通常 5 秒内有人回复</div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Tawk JS SDK：加载完自动 maximize -->
+  <script type="text/javascript">
+    var Tawk_API = Tawk_API || {};
+    var Tawk_LoadStart = new Date();
+
+    Tawk_API.onLoad = function(){
+      // 一加载完就最大化聊天窗,不让用户多点一次
+      try { Tawk_API.maximize(); } catch(e) {}
+      setTimeout(() => {
+        var m = document.getElementById('loadingMask');
+        if (m) m.classList.add('hidden');
+      }, 800);
+      fireConversion('widget_loaded');
+    };
+
+    Tawk_API.onChatStarted = function(){ fireConversion('chat_started'); };
+    Tawk_API.onChatMessageVisitor = function(){ fireConversion('visitor_sent_msg'); };
+    Tawk_API.onChatMaximized = function(){ fireConversion('chat_maximized'); };
+
+    (function(){
+      var s1 = document.createElement("script"),
+          s0 = document.getElementsByTagName("script")[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/6a0e7cc162b0761c3d8d4e9d/1jp49el4p';
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1, s0);
+    })();
+
+    // 兜底：8 秒后无论如何隐藏遮罩
+    setTimeout(() => {
+      var m = document.getElementById('loadingMask');
+      if (m) m.classList.add('hidden');
+    }, 8000);
+  </script>
+
+  <script>
+    function addWechat() {
+      const wxid = 'ATR20188';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(wxid).then(() => showToast('微信号 ATR20188 已复制 → 粘贴搜索加好友'));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = wxid; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); showToast('微信号 ATR20188 已复制'); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+      fireConversion('wechat_copied');
+
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        setTimeout(() => {
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = 'weixin://';
+          document.body.appendChild(iframe);
+          setTimeout(() => iframe.remove(), 1000);
+        }, 800);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>
