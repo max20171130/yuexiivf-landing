@@ -32,6 +32,7 @@
       margin: 0 auto;
       background: #ededed;
       box-shadow: 0 0 30px rgba(0,0,0,0.08);
+      padding-bottom: 145px; /* 给底部 fixed 按钮留位置,防遮挡 */
     }
 
     /* 顶部栏 */
@@ -105,10 +106,42 @@
 
     /* 聊天区 */
     .chat-body {
-      padding: 8px 14px 12px;
+      padding: 8px 14px 8px;
       display: flex;
       flex-direction: column;
       gap: 4px;
+    }
+
+    /* Mandy 气泡下方的 inline CTA 按钮组 */
+    .inline-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 0 0 44px;
+      margin: 6px 0 10px;
+    }
+    .inline-cta-btn {
+      background: #fff;
+      border: 1.5px solid #07c160;
+      color: #07c160;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .inline-cta-btn:active { background: #07c160; color: #fff; transform: scale(0.96); }
+    .inline-cta-btn.primary {
+      background: #07c160;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(7,193,96,0.35);
+      animation: ctaInlinePulse 2s infinite;
+    }
+    @keyframes ctaInlinePulse {
+      0%, 100% { box-shadow: 0 2px 8px rgba(7,193,96,0.35); }
+      50% { box-shadow: 0 2px 14px rgba(7,193,96,0.6); }
     }
     .system-time {
       align-self: center;
@@ -144,15 +177,17 @@
     }
     .bubble {
       background: #fff;
-      padding: 10px 13px;
+      padding: 9px 12px;
       border-radius: 4px;
-      font-size: 14.5px;
-      line-height: 1.55;
+      font-size: 14px;
+      line-height: 1.45;
       max-width: 80%;
       position: relative;
       box-shadow: 0 1px 1px rgba(0,0,0,0.04);
       word-break: break-word;
     }
+    .bubble br + br { display: none; }  /* 双换行压缩为单换行 */
+    .bubble br { line-height: 0.6; }     /* 段落间距更紧 */
     .bubble::before {
       content: '';
       position: absolute;
@@ -307,12 +342,18 @@
     .action-bar {
       background: #f7f7f7;
       border-top: 1px solid #e0e0e0;
-      padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
+      padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      position: sticky;
+      gap: 6px;
+      position: fixed;
       bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      z-index: 80;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
     }
     .action-hint {
       text-align: center;
@@ -367,6 +408,90 @@
       z-index: 200;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== 留资 Modal ===== */
+    .contact-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 20px;
+      animation: cmFadeIn 0.25s;
+    }
+    @keyframes cmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .contact-modal-overlay.show { display: flex; }
+    .contact-modal-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px 20px 18px;
+      max-width: 340px;
+      width: 100%;
+      animation: cmPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    @keyframes cmPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .contact-modal-close {
+      position: absolute;
+      top: 10px; right: 12px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      color: #888;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .contact-modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 6px;
+      color: #222;
+    }
+    .contact-modal-sub {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .contact-modal-input {
+      width: 100%;
+      border: 1.5px solid #e0e2e5;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: #f7f8fa;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .contact-modal-input:focus { border-color: #07c160; background: #fff; }
+    .contact-modal-submit {
+      background: #07c160;
+      color: #fff;
+      border: none;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(7,193,96,0.4);
+    }
+    .contact-modal-submit:active { transform: scale(0.97); }
+    .contact-modal-dismiss {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      color: #999;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
     @media (max-width: 420px) {
       .chat-app { box-shadow: none; }
@@ -492,11 +617,23 @@
           <span class="icon">📞</span>
           <span>拨打电话</span>
         </button>
-        <button class="action-btn btn-form" onclick="scrollToQuiz()">
+        <button class="action-btn btn-form" onclick="openContactModal()">
           <span class="icon">📝</span>
           <span>获取代孕方案</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- 留资 Modal -->
+  <div class="contact-modal-overlay" id="contactModal" onclick="if(event.target===this)closeContactModal()">
+    <div class="contact-modal-card">
+      <button class="contact-modal-close" onclick="closeContactModal()">×</button>
+      <div class="contact-modal-title">📞 获取专属代孕方案</div>
+      <div class="contact-modal-sub">留下您的微信号或电话<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估</div>
+      <input type="text" class="contact-modal-input" id="contactModalInput" placeholder="请输入微信号或电话" autocomplete="off">
+      <button class="contact-modal-submit" onclick="submitContactModal()">立即获取方案 ➤</button>
+      <a class="contact-modal-dismiss" onclick="closeContactModal()">暂不需要</a>
     </div>
   </div>
 
@@ -507,9 +644,10 @@
        📝 聊天消息内容 — 在这里编辑
        ============================================================ */
     const messages = [
-      "你好 👋 我是悦喜汇的辅助生育咨询师。",
-      "从业 <strong>18 年</strong>来，我见过太多家庭。<br>有人 <strong>50 万</strong>顺利把孩子接回家，也有人花了 <strong>200 万</strong>，最后还是失败了。<br>很多时候，差的不是钱，而是<strong>有没有选对地方、选对人</strong>。",
-      "你可以先简单说一下自己的情况，我会根据你的<strong>预算、年龄、婚姻情况</strong>，帮你分析一下目前更适合哪种方案 👇"
+      "您好,我是 <strong>悦喜汇</strong> 的辅助生殖顾问 <strong>Mandy</strong>。<br>" +
+      "悦喜汇成立 <strong>18 年</strong>,有 <strong>上万成功案例</strong> — 这意味着我们几乎踩过所有的坑和风险点。别人还在试错的,我们早就了然于心,且有了成熟的方案减少风险的发生。<br>" +
+      "我们对世界各国的政策了如指掌,能根据您的情况(<strong>法律合规、价格、时间要求</strong>等)为您建议最稳妥的方案。<br>" +
+      "如果您确实希望走代孕这条路,相信为您提供一些 <strong>免费的建议</strong> 会为您锦上添花。马上加我微信,像朋友那样聊聊吧?"
     ];
 
     /* ============================================================ */
@@ -555,8 +693,21 @@
     function playChat() {
       // 所有消息一次性渲染，无缓冲
       messages.forEach(m => appendBubble(m));
+      // Mandy 气泡后插入 3 个 CTA 按钮(跟 chat.html 一致)
+      appendInlineCta();
       // 立即显示问卷
       quizArea.classList.add('show');
+    }
+
+    function appendInlineCta() {
+      const cta = document.createElement('div');
+      cta.className = 'inline-cta';
+      cta.innerHTML = `
+        <button class="inline-cta-btn primary" onclick="addWechat()">💬 复制微信 ATR20188</button>
+        <button class="inline-cta-btn primary" onclick="callPhone('13822192921')">📞 复制电话</button>
+        <button class="inline-cta-btn" onclick="openContactModal()">✏️ 留下我的微信/电话</button>
+      `;
+      chatBody.appendChild(cta);
     }
 
     window.addEventListener('load', playChat);
@@ -690,6 +841,55 @@
     function scrollToQuiz() {
       quizArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    // ============ 「获取代孕方案」按钮 — 弹留资 Modal ============
+    function openContactModal() {
+      document.getElementById('contactModal').classList.add('show');
+      setTimeout(() => document.getElementById('contactModalInput').focus(), 200);
+    }
+    function closeContactModal() {
+      document.getElementById('contactModal').classList.remove('show');
+    }
+    function submitContactModal() {
+      const contact = document.getElementById('contactModalInput').value.trim();
+      if (!contact) {
+        showToast('请输入您的微信号或电话');
+        document.getElementById('contactModalInput').focus();
+        return;
+      }
+      // 走跟问卷一样的提交逻辑(Web3Forms 邮件 + Google Ads 转化)
+      const fd = new FormData();
+      fd.append('access_key', '2c1aeba8-e386-4089-81a4-a9532238f9f3');
+      fd.append('subject', '🎯【悦喜汇】快捷留资 — ' + contact.slice(0, 30));
+      fd.append('from_name', '悦喜汇 yuexiivf-landing.vercel.app (modal)');
+      fd.append('message',
+        '📞 联系方式: ' + contact + '\n' +
+        '🌐 来源: yuexiivf-landing.vercel.app · 获取代孕方案弹窗\n' +
+        '⏰ 时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }) + '\n' +
+        '🖥️ 设备: ' + navigator.userAgent.slice(0, 80)
+      );
+      fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
+        .catch(e => console.error('Web3Forms error', e));
+
+      // Google Ads 转化
+      const txnId = 'lp_modal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      if (window.gtag) {
+        gtag('event', 'generate_lead', { event_category: 'form', event_label: 'modal', transaction_id: txnId });
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
+        });
+      }
+
+      closeContactModal();
+      showToast('已收到 ✓ Mandy 顾问 5 分钟内联系您');
+    }
+
+    // Enter 提交
+    document.addEventListener('DOMContentLoaded', () => {
+      const inp = document.getElementById('contactModalInput');
+      if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitContactModal(); });
+    });
 
     // ============ 加微信（复制+唤起微信APP+转化追踪） ============
     function addWechat() {
