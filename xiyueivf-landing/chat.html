@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>悦喜汇 · 18年辅助生育咨询师 — 在线咨询</title>
+  <title>悦喜汇 · 18年辅助生殖顾问 — 在线咨询</title>
 
-  <!-- Google Ads + GA4 转化追踪 -->
+  <!-- Google Ads 转化追踪 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18163080541"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -13,20 +13,6 @@
     gtag('js', new Date());
     gtag('config', 'AW-18163080541');
     gtag('config', 'G-PJ0KE3HLJF');
-
-    function fireConversion(label) {
-      const txnId = 'lp_tawk_' + label + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-      if (window.gtag) {
-        gtag('event', 'engaged_chat', { event_category: 'chat', event_label: label, transaction_id: txnId });
-        gtag('event', 'conversion', {
-          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
-          'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
-        });
-      }
-    }
-
-    // 兜底：30 秒还在页面上 = 强意向
-    setTimeout(() => fireConversion('stayed_30s'), 30000);
   </script>
 
   <style>
@@ -35,199 +21,876 @@
       height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
       overflow: hidden;
-      background: #07c160;
+      background: #f3f5f8;
+      color: #222;
     }
 
-    /* 顶栏 */
+    /* ===== 顶部品牌栏 ===== */
     .topbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      background: #1f1f1f;
-      color: #fff;
-      padding: 10px 14px;
+      background: #fff;
+      border-bottom: 1px solid #e8eaed;
+      padding: 10px 14px 8px;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .topbar-row1 {
       display: flex;
       align-items: center;
       gap: 10px;
-      height: 56px;
-      z-index: 2147483647;
     }
     .topbar-avatar {
-      width: 36px; height: 36px;
-      border-radius: 8px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
       background: linear-gradient(135deg, #1aad19, #07c160);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 17px; color: #fff;
+      font-weight: 800; font-size: 18px; color: #fff;
+      flex-shrink: 0;
     }
     .topbar-info { flex: 1; min-width: 0; }
-    .topbar-name { font-weight: 600; font-size: 14px; line-height: 1.2; }
-    .topbar-status {
-      font-size: 11px;
-      color: #9bda9b;
+    .topbar-name {
+      font-weight: 700; font-size: 15px; line-height: 1.2;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-name::after {
+      content: "✓";
+      display: inline-block;
+      width: 14px; height: 14px;
+      background: #1da1f2;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 9px;
+      text-align: center;
+      line-height: 14px;
+      font-weight: 900;
+    }
+    .topbar-sub {
+      font-size: 11.5px;
+      color: #888;
       margin-top: 2px;
-      display: flex; align-items: center; gap: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .online-dot {
       width: 7px; height: 7px;
       border-radius: 50%;
       background: #07c160;
+      display: inline-block;
       animation: pulse 1.6s infinite;
     }
     @keyframes pulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(7,193,96,0.55); }
       50% { box-shadow: 0 0 0 6px rgba(7,193,96,0); }
     }
-    .topbar-wechat {
-      background: #07c160;
-      color: #fff;
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-size: 12.5px;
-      font-weight: 700;
+    .topbar-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .topbar-icon-btn {
+      width: 28px; height: 28px;
       border: none;
+      background: transparent;
       cursor: pointer;
-      display: flex; align-items: center; gap: 4px;
-      flex-shrink: 0;
+      font-size: 14px;
+      color: #999;
+      border-radius: 6px;
     }
-    .topbar-wechat:active { transform: scale(0.96); }
+    .topbar-icon-btn:active { background: #f0f0f0; }
 
-    /* 全屏加载遮罩 (绿色背景, 跟 Tawk 主题色统一) */
-    .loading-mask {
-      position: fixed;
-      top: 56px; left: 0; right: 0; bottom: 0;
-      background: #07c160;
+    /* ===== 服务标签条 ===== */
+    .service-badges {
+      padding: 8px 14px;
+      background: #fff;
+      border-bottom: 1px solid #f0f1f4;
       display: flex;
       flex-direction: column;
+      gap: 4px;
+    }
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #555;
+      line-height: 1.4;
+    }
+    .badge-label {
+      font-weight: 700;
+      color: #07c160;
+      flex-shrink: 0;
+    }
+
+    /* ===== 聊天主区 ===== */
+    .chat-wrap {
+      position: fixed;
+      top: 130px;
+      left: 0; right: 0;
+      bottom: 70px;
+      overflow-y: auto;
+      padding: 14px 12px;
+      background: #f3f5f8;
+      -webkit-overflow-scrolling: touch;
+    }
+    .msg {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      max-width: 88%;
+      animation: msgIn 0.3s ease-out;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1aad19, #07c160);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px; color: #fff;
+      flex-shrink: 0;
+    }
+    .msg-bubble {
+      background: #fff;
+      padding: 10px 13px;
+      border-radius: 4px 14px 14px 14px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: #222;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      word-wrap: break-word;
+    }
+    .msg-bubble strong { color: #07c160; }
+
+    .msg.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+    .msg.user .msg-avatar {
+      background: #4a90e2;
+    }
+    .msg.user .msg-bubble {
+      background: #07c160;
+      color: #fff;
+      border-radius: 14px 4px 14px 14px;
+    }
+
+    .status-pill {
+      text-align: center;
+      font-size: 11.5px;
+      color: #aaa;
+      margin: 8px 0 14px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      transition: opacity 0.5s ease;
-      z-index: 50;
+      gap: 6px;
     }
-    .loading-mask.hidden { opacity: 0; pointer-events: none; }
-    .loading-spinner {
-      width: 44px; height: 44px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+    .status-dots {
+      display: inline-block;
+      animation: dots 1.4s infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: "."; }
+      40% { content: ".."; }
+      60%, 100% { content: "..."; }
+    }
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      background: #fff;
+      border-radius: 14px;
+      width: fit-content;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .typing-dot {
+      width: 6px; height: 6px;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      background: #bbb;
+      animation: typingBounce 1.4s infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { color: #fff; font-size: 14px; font-weight: 500; opacity: 0.95; }
-    .loading-sub { color: #fff; font-size: 12px; opacity: 0.75; margin-top: -8px; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
 
-    /* Toast */
+    /* ===== 快捷按钮 ===== */
+    .quick-replies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-left: 44px;
+      margin-bottom: 14px;
+    }
+    .quick-btn {
+      background: #fff;
+      border: 1px solid #07c160;
+      color: #07c160;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-btn:active {
+      background: #07c160;
+      color: #fff;
+      transform: scale(0.96);
+    }
+    .quick-btn.cta-primary {
+      background: #07c160;
+      color: #fff;
+      border-color: #07c160;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(7,193,96,0.3);
+      animation: ctaPulse 2s infinite;
+    }
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 2px 8px rgba(7,193,96,0.3); }
+      50% { box-shadow: 0 2px 14px rgba(7,193,96,0.55); }
+    }
+    .quick-btn.cta-primary:active {
+      background: #06a052;
+      transform: scale(0.96);
+    }
+
+    /* ===== 底部输入区 ===== */
+    .input-area {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 1px solid #e8eaed;
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+      box-shadow: 0 -1px 4px rgba(0,0,0,0.04);
+    }
+    .input-field {
+      flex: 1;
+      border: 1px solid #e0e2e5;
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 14.5px;
+      background: #f7f8fa;
+      outline: none;
+      font-family: inherit;
+      color: #222;
+    }
+    .input-field:focus {
+      border-color: #07c160;
+      background: #fff;
+    }
+    .send-btn {
+      width: 44px; height: 44px;
+      border: none;
+      background: #07c160;
+      color: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(7,193,96,0.35);
+      transition: transform 0.15s;
+    }
+    .send-btn:active { transform: scale(0.92); }
+    .send-btn:disabled {
+      background: #c0c0c0;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* ===== Toast ===== */
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 24%;
+      bottom: 110px;
       transform: translateX(-50%) translateY(8px);
       background: rgba(0,0,0,0.85);
       color: #fff;
       padding: 12px 22px;
       border-radius: 999px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s, transform 0.2s;
       z-index: 9999;
+      max-width: 86%;
+      text-align: center;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* 把 Tawk 浮窗强制改成全屏(在顶栏下方) */
-    iframe[title*="chat" i],
-    iframe[id*="tawk" i],
-    #tawkchat-container,
-    .tawk-chat-panel {
-      position: fixed !important;
-      top: 56px !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      height: calc(100vh - 56px) !important;
-      max-width: 100vw !important;
-      max-height: calc(100vh - 56px) !important;
-      border-radius: 0 !important;
-      z-index: 100 !important;
-      transform: none !important;
+    /* ===== 成功遮罩 ===== */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
     }
+    .success-overlay.show { display: flex; }
+    .success-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    @keyframes pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .success-icon {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: #07c160;
+      color: #fff;
+      font-size: 32px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .success-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .success-msg { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 18px; }
+    .wx-box {
+      background: #f3f5f8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: #444;
+    }
+    .wx-box strong { color: #07c160; font-weight: 700; font-size: 15px; }
+    .success-btn {
+      background: #07c160;
+      color: #fff;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+    }
+    .success-btn:active { transform: scale(0.97); }
+
+    /* ===== 通用模态(自动留资 + 挽留) ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      padding: 20px;
+      animation: fadeIn 0.25s;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-overlay.show { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px 20px 18px;
+      max-width: 340px;
+      width: 100%;
+      animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 12px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      color: #888;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 6px;
+      color: #222;
+    }
+    .modal-sub {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .modal-input {
+      width: 100%;
+      border: 1.5px solid #e0e2e5;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: #f7f8fa;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .modal-input:focus { border-color: #07c160; background: #fff; }
+    .modal-submit {
+      background: #07c160;
+      color: #fff;
+      border: none;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(7,193,96,0.4);
+    }
+    .modal-submit:active { transform: scale(0.97); }
+    .modal-dismiss {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      color: #999;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* 挽留弹窗里的问题按钮 */
+    .qm-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: #f0f5ff;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: #333;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .qm-btn:active {
+      background: #d6e6ff;
+      transform: scale(0.98);
+    }
+    .qm-btn::after {
+      content: "›";
+      font-size: 20px;
+      color: #999;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 999px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #999;
+    }
+    .btn-primary {
+      background: #07c160;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(7,193,96,0.4);
+    }
+    .btn-primary:active, .btn-secondary:active { transform: scale(0.96); }
   </style>
 </head>
 <body>
 
   <!-- 顶栏 -->
   <div class="topbar">
-    <div class="topbar-avatar">悦</div>
-    <div class="topbar-info">
-      <div class="topbar-name">悦喜汇 · 辅助生育咨询</div>
-      <div class="topbar-status">
-        <span class="online-dot"></span>
-        <span>在线 · 18年从业</span>
+    <div class="topbar-row1">
+      <div class="topbar-avatar">悦</div>
+      <div class="topbar-info">
+        <div class="topbar-name">Mandy · 悦喜汇辅助生育顾问</div>
+        <div class="topbar-sub">
+          <span class="online-dot"></span>
+          <span id="onlineStatus">2000+ 家庭已咨询 · 18年从业 · 在线时长 <span id="onlineTime">00:00</span></span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-icon-btn" title="静音">🔇</button>
+        <button class="topbar-icon-btn" title="加微信" onclick="copyWechat()">💬</button>
       </div>
     </div>
-    <button class="topbar-wechat" onclick="addWechat()">💬 加微信</button>
   </div>
 
-  <!-- 加载遮罩 -->
-  <div class="loading-mask" id="loadingMask">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">正在为你接通顾问...</div>
-    <div class="loading-sub">通常 5 秒内有人回复</div>
+  <!-- 服务标签条 -->
+  <div class="service-badges">
+    <div class="badge-row">
+      <span class="badge-label">业务范围:</span>
+      <span>代孕 · 试管 · 海外/国内方案 · 高龄助孕</span>
+    </div>
+    <div class="badge-row">
+      <span class="badge-label">服务优势:</span>
+      <span>1对1专属顾问 · 9万美金全包 · 不成功按合同退款</span>
+    </div>
+  </div>
+
+  <!-- 聊天对话区 -->
+  <div class="chat-wrap" id="chatWrap">
+    <!-- 消息会动态插入 -->
+  </div>
+
+  <!-- 底部输入区 -->
+  <div class="input-area">
+    <input
+      type="text"
+      class="input-field"
+      id="inputField"
+      placeholder="留下您的微信号或电话,顾问 5 分钟内联系您"
+      autocomplete="off"
+    />
+    <button class="send-btn" id="sendBtn" onclick="handleSend()">➤</button>
   </div>
 
   <div id="toast" class="toast"></div>
 
-  <!-- Tawk JS SDK：加载完自动 maximize -->
-  <script type="text/javascript">
-    var Tawk_API = Tawk_API || {};
-    var Tawk_LoadStart = new Date();
+  <!-- 1 秒自动弹出:留资框 -->
+  <div class="modal-overlay" id="autoContactModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeAutoModal()">×</button>
+      <div class="modal-title">📞 1 对 1 顾问 Mandy 在线</div>
+      <div class="modal-sub">留下您的微信号或电话<br>5 分钟内主动联系您,免费方案评估</div>
+      <input type="text" class="modal-input" id="autoContactInput" placeholder="请输入微信号或电话" autocomplete="off">
+      <button class="modal-submit" onclick="submitAutoContact()">立即预约咨询 ➤</button>
+      <a class="modal-dismiss" onclick="closeAutoModal()">暂不需要</a>
+    </div>
+  </div>
 
-    Tawk_API.onLoad = function(){
-      // 一加载完就最大化聊天窗,不让用户多点一次
-      try { Tawk_API.maximize(); } catch(e) {}
-      setTimeout(() => {
-        var m = document.getElementById('loadingMask');
-        if (m) m.classList.add('hidden');
-      }, 800);
-      fireConversion('widget_loaded');
-    };
+  <!-- 退出/返回时挽留 -->
+  <div class="modal-overlay" id="exitModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeExitModal()">×</button>
+      <div class="modal-title">您可能还想问这些问题</div>
+      <button class="qm-btn" onclick="askExit('cheapest')">💰 哪个国家代孕最便宜?</button>
+      <button class="qm-btn" onclick="askExit('fastest')">⏰ 哪个国家代孕最快?</button>
+      <button class="qm-btn" onclick="askExit('value')">⚖️ 哪个国家性价比最高?</button>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="confirmExit()">离开</button>
+        <button class="btn-primary" onclick="closeExitModal()">再聊聊</button>
+      </div>
+    </div>
+  </div>
 
-    Tawk_API.onChatStarted = function(){ fireConversion('chat_started'); };
-    Tawk_API.onChatMessageVisitor = function(){ fireConversion('visitor_sent_msg'); };
-    Tawk_API.onChatMaximized = function(){ fireConversion('chat_maximized'); };
-
-    (function(){
-      var s1 = document.createElement("script"),
-          s0 = document.getElementsByTagName("script")[0];
-      s1.async = true;
-      s1.src = 'https://embed.tawk.to/6a0e7cc162b0761c3d8d4e9d/1jp49el4p';
-      s1.charset = 'UTF-8';
-      s1.setAttribute('crossorigin','*');
-      s0.parentNode.insertBefore(s1, s0);
-    })();
-
-    // 兜底：8 秒后无论如何隐藏遮罩
-    setTimeout(() => {
-      var m = document.getElementById('loadingMask');
-      if (m) m.classList.add('hidden');
-    }, 8000);
-  </script>
+  <!-- 成功遮罩 -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+      <button class="modal-close" onclick="closeSuccessOverlay()">×</button>
+      <div class="success-icon">✓</div>
+      <div class="success-title">已通知顾问</div>
+      <div class="success-msg">您的联系方式已发送给悦喜汇顾问,5 分钟内会主动联系您。</div>
+      <div class="wx-box">
+        也可以主动加顾问微信:<br>
+        <strong>ATR20188</strong>
+      </div>
+      <button class="success-btn" onclick="copyWechat()">📋 一键复制微信号</button>
+    </div>
+  </div>
 
   <script>
-    function addWechat() {
-      const wxid = 'ATR20188';
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(wxid).then(() => showToast('微信号 ATR20188 已复制 → 粘贴搜索加好友'));
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = wxid; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); showToast('微信号 ATR20188 已复制'); } catch(e) {}
-        document.body.removeChild(ta);
-      }
-      fireConversion('wechat_copied');
+    // ===== 状态 =====
+    const chatWrap = document.getElementById('chatWrap');
+    const inputField = document.getElementById('inputField');
+    const sendBtn = document.getElementById('sendBtn');
+    let submittedOnce = false;
+    let startTime = Date.now();
+    // 会话 ID — 用于把同一访客的多条消息归档
+    const SESSION_ID = 'S' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+    let msgCount = 0;
 
+    // ===== 实时邮件通知(每条客户消息) =====
+    async function notifyMessage(text, source) {
+      msgCount++;
+      const fd = new FormData();
+      fd.append('access_key', '2c1aeba8-e386-4089-81a4-a9532238f9f3');
+      fd.append('subject', '【悦喜汇 chat】#' + msgCount + ' 客户消息 [' + SESSION_ID + ']');
+      fd.append('from_name', '悦喜汇 chat.html · 客户消息推送');
+      fd.append('message',
+        '💬 客户消息: ' + text + '\n\n' +
+        '🆔 会话 ID: ' + SESSION_ID + ' (#' + msgCount + ' 条)\n' +
+        '📍 来源: ' + (source || '聊天输入框') + '\n' +
+        '⏰ 时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }) + '\n' +
+        '🌐 页面: yuexiivf-landing.vercel.app/chat\n' +
+        '🖥️ 设备: ' + navigator.userAgent.slice(0, 80)
+      );
+      try {
+        // 不等待结果,不阻塞 UI
+        fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+      } catch(e) { console.error('消息通知失败', e); }
+    }
+
+    // ===== 在线时长计时器 =====
+    function tickTimer() {
+      // 故意从 18:23 起跳,让访客觉得"已经在线很久"
+      const baseSec = 18 * 60 + 23 + Math.floor((Date.now() - startTime) / 1000);
+      const m = Math.floor(baseSec / 60);
+      const s = baseSec % 60;
+      document.getElementById('onlineTime').textContent =
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+    setInterval(tickTimer, 1000);
+    tickTimer();
+
+    // ===== 消息渲染 =====
+    function addMsg(text, who = 'agent', delay = 0) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          const msg = document.createElement('div');
+          msg.className = 'msg ' + (who === 'user' ? 'user' : '');
+          msg.innerHTML = `
+            <div class="msg-avatar">${who === 'user' ? '我' : '悦'}</div>
+            <div class="msg-bubble">${text}</div>
+          `;
+          chatWrap.appendChild(msg);
+          chatWrap.scrollTop = chatWrap.scrollHeight;
+          resolve();
+        }, delay);
+      });
+    }
+
+    function addStatus(text, delay = 0) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          const s = document.createElement('div');
+          s.className = 'status-pill';
+          s.innerHTML = `<span>${text}</span>`;
+          chatWrap.appendChild(s);
+          chatWrap.scrollTop = chatWrap.scrollHeight;
+          resolve();
+        }, delay);
+      });
+    }
+
+    function addTyping() {
+      const t = document.createElement('div');
+      t.className = 'msg';
+      t.id = 'typingIndicator';
+      t.innerHTML = `
+        <div class="msg-avatar">悦</div>
+        <div class="typing">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+      `;
+      chatWrap.appendChild(t);
+      chatWrap.scrollTop = chatWrap.scrollHeight;
+    }
+    function removeTyping() {
+      const t = document.getElementById('typingIndicator');
+      if (t) t.remove();
+    }
+
+    function addQuickReplies(options) {
+      const q = document.createElement('div');
+      q.className = 'quick-replies';
+      q.id = 'quickReplies';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        btn.textContent = opt.label;
+        btn.onclick = () => {
+          handleQuickClick(opt);
+          q.remove();
+        };
+        q.appendChild(btn);
+      });
+      chatWrap.appendChild(q);
+      chatWrap.scrollTop = chatWrap.scrollHeight;
+    }
+
+    // ===== 启动对话流 =====
+    async function startConversation() {
+      await addMsg(
+        '您好,我是 <strong>悦喜汇</strong> 的辅助生殖顾问 <strong>Mandy</strong>。<br><br>' +
+        '悦喜汇成立 <strong>18 年</strong>,有 <strong>上万成功案例</strong> — ' +
+        '这意味着我们几乎踩过所有的坑和风险点。别人还在试错的,我们早就了然于心,' +
+        '且有了成熟的方案减少风险的发生。<br><br>' +
+        '我们对世界各国的政策了如指掌,能根据您的情况(<strong>法律合规、价格、时间要求</strong>等)' +
+        '为您建议最稳妥的方案。<br><br>' +
+        '如果您确实希望走代孕这条路,相信为您提供一些 <strong>免费的建议</strong> 会为您锦上添花。' +
+        '马上加我微信,像朋友那样聊聊吧?',
+        'agent', 300
+      );
+      await addStatus('• 正在为您服务 •', 600);
+      // 显示 3 个 CTA 按钮:复制微信 / 复制电话 / 留我的方式
+      addCtaButtons();
+    }
+
+    function addCtaButtons() {
+      const q = document.createElement('div');
+      q.className = 'quick-replies';
+      q.id = 'ctaButtons';
+      q.innerHTML = `
+        <button class="quick-btn cta-primary" onclick="copyWechat()">💬 复制微信 ATR20188</button>
+        <button class="quick-btn cta-primary" onclick="copyPhone()">📞 复制电话</button>
+        <button class="quick-btn" onclick="openContactModal()">✏️ 留下我的微信/电话</button>
+      `;
+      chatWrap.appendChild(q);
+      chatWrap.scrollTop = chatWrap.scrollHeight;
+    }
+
+    // ===== 快捷回复处理 =====
+    const replyScripts = {
+      cost:    { user: '我想了解费用',     agent: '好的!悦喜汇 <strong>9 万美金全包</strong> — 包括试管 / 代孕妈妈 / 法律 / 律师 / 来回机票 / 双语翻译,无任何隐性收费。<br><br>具体细节我直接发给您 — 留下您的<strong>微信号或电话</strong>,我马上联系您。' },
+      age:     { user: '高龄能做吗',       agent: '可以的!我们做过最大的客户 <strong>52 岁</strong>,通过捐卵+代孕成功抱娃。<br><br>您的年龄和身体情况我需要详细了解 — 留下您的<strong>微信</strong>,我加您后一对一沟通。' },
+      gene:    { user: '我有遗传病',       agent: '完全可以解决!我们配套 <strong>第三代试管(PGD/PGS)</strong>,能筛查 200+ 种遗传病,确保宝宝健康。<br><br>留下您的<strong>微信号</strong>,我把成功案例发您看。' },
+      oversea: { user: '海外方案',          agent: '海外有 <strong>哈萨克斯坦 8 万美金 / 美国 20 万美金</strong> 等多个目的地,每个国家流程和合法性不同。<br><br>留下您的<strong>微信</strong>,我根据您情况推荐最合适的。' },
+      process: { user: '看看流程',          agent: '流程很简单:<br>1. 体检评估(免费)<br>2. 签合同付定金<br>3. 试管移植到代孕妈妈<br>4. 怀孕后定期产检<br>5. 出生办证回国<br><br>全程 <strong>最快 13 个月抱娃</strong>。具体细节留个<strong>微信</strong>详聊。' },
+    };
+
+    async function handleQuickClick(opt) {
+      const script = replyScripts[opt.key];
+      if (!script) return;
+      await addMsg(script.user, 'user', 0);
+      addTyping();
+      await new Promise(r => setTimeout(r, 1400));
+      removeTyping();
+      await addMsg(script.agent, 'agent', 0);
+      // 引导输入
+      inputField.focus();
+    }
+
+    // ===== 用户主动发消息 =====
+    async function handleSend() {
+      const txt = inputField.value.trim();
+      if (!txt) {
+        showToast('请输入您的微信号或电话');
+        inputField.focus();
+        return;
+      }
+      sendBtn.disabled = true;
+      inputField.value = '';
+
+      await addMsg(escapeHtml(txt), 'user', 0);
+
+      // 检测是否含联系方式 (简单判断: 有数字 7 位以上 或 微信关键字)
+      const hasContact = /\d{7,}/.test(txt) ||
+                         /微信|wechat|wx|v信|手机|电话|联系|qq/i.test(txt);
+
+      // 📨 不论是否含联系方式,先推一条邮件通知给你 — 这样客户聊任何内容你都能看到
+      if (!hasContact) {
+        notifyMessage(txt, '聊天输入框 · 普通消息');
+      }
+      // (含联系方式的会走 submitLead,那个发完整版邮件,避免重复)
+
+      addTyping();
+      await new Promise(r => setTimeout(r, 1200));
+      removeTyping();
+
+      if (hasContact && !submittedOnce) {
+        // 视为留资,提交
+        submittedOnce = true;
+        await addMsg('收到!正在通知顾问,请稍等...', 'agent', 0);
+        await submitLead(txt);
+      } else if (hasContact && submittedOnce) {
+        await addMsg('已收到您的更新联系方式,顾问会通过新方式联系您 😊', 'agent', 0);
+        await submitLead(txt);
+      } else {
+        // 不是联系方式,引导
+        await addMsg('好的,我已经记下来了。<br><br>方便<strong>留个微信号或电话</strong>吗?顾问看到后 5 分钟内主动联系您,详细给您评估方案。', 'agent', 0);
+        inputField.focus();
+        sendBtn.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // ===== 提交到 Web3Forms + Google Ads 转化 =====
+    async function submitLead(contact) {
+      // 收集对话记录
+      const allMsgs = Array.from(chatWrap.querySelectorAll('.msg')).map(m => {
+        const isUser = m.classList.contains('user');
+        const txt = m.querySelector('.msg-bubble')?.textContent || '';
+        return (isUser ? '【客户】' : '【顾问】') + txt;
+      }).join('\n');
+
+      const fd = new FormData();
+      fd.append('access_key', '2c1aeba8-e386-4089-81a4-a9532238f9f3');
+      fd.append('subject', '🎯【悦喜汇】留资成功! ' + contact.slice(0, 30) + ' [' + SESSION_ID + ']');
+      fd.append('from_name', '悦喜汇 chat.html · 留资通知');
+      fd.append('message',
+        '✅ 留资成功!\n\n' +
+        '📞 联系方式: ' + contact + '\n' +
+        '🆔 会话 ID: ' + SESSION_ID + '(前面 ' + msgCount + ' 条普通消息可在邮箱按这个 ID 搜索归档)\n\n' +
+        '🌐 来源: yuexiivf-landing.vercel.app/chat\n' +
+        '⏰ 时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }) + '\n\n' +
+        '💬 完整对话:\n' + allMsgs
+      );
+
+      try {
+        await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
+      } catch(e) { console.error('Web3Forms 失败', e); }
+
+      // Google Ads 转化打点
+      const txnId = 'chat_lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      if (window.gtag) {
+        gtag('event', 'generate_lead', { event_category: 'chat', value: 1.0 });
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
+        });
+      }
+
+      // 显示成功遮罩
+      setTimeout(() => {
+        document.getElementById('successOverlay').classList.add('show');
+      }, 800);
+    }
+
+    // 关闭成功遮罩
+    function closeSuccessOverlay() {
+      document.getElementById('successOverlay').classList.remove('show');
+    }
+
+    // ===== Toast =====
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // ===== 加微信(复制+唤起) =====
+    function copyWechat() {
+      const wxid = 'ATR20188';
+      copyToClipboard(wxid, '微信号 ATR20188 已复制 → 粘贴搜索加好友');
+      fireCtaConversion('wechat_copied');
+
+      // 移动端唤起微信
       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         setTimeout(() => {
           const iframe = document.createElement('iframe');
@@ -239,13 +902,218 @@
       }
     }
 
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    // ===== 复制电话(同时支持点击拨打) =====
+    function copyPhone() {
+      const phone = '13822192921';
+      copyToClipboard(phone, '电话 138 2219 2921 已复制');
+      fireCtaConversion('phone_copied');
+
+      // 移动端尝试唤起拨号
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        setTimeout(() => {
+          window.location.href = 'tel:+86' + phone;
+        }, 600);
+      }
     }
+
+    // 通用复制
+    function copyToClipboard(text, toastMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(toastMsg));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); showToast(toastMsg); } catch(e) {}
+        document.body.removeChild(ta);
+      }
+    }
+
+    // CTA 点击算转化
+    function fireCtaConversion(label) {
+      const txnId = 'chat_cta_' + label + '_' + Date.now();
+      if (window.gtag) {
+        gtag('event', 'cta_click', { event_category: 'chat', event_label: label });
+        gtag('event', 'conversion', {
+          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
+        });
+      }
+    }
+
+    // ===== Enter 发送 =====
+    inputField.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSend();
+    });
+
+    // ===== 启动 =====
+    startConversation();
+
+    // ===== 留资框(由用户主动触发) =====
+    let pendingAnswerKey = null;
+
+    function openContactModal(customSubtitle) {
+      const sub = customSubtitle ||
+        '留下您的微信号或电话<br>5 分钟内 Mandy 顾问主动联系您,免费方案评估';
+      document.querySelector('#autoContactModal .modal-sub').innerHTML = sub;
+      document.getElementById('autoContactModal').classList.add('show');
+      setTimeout(() => document.getElementById('autoContactInput').focus(), 200);
+    }
+
+    function closeAutoModal() {
+      document.getElementById('autoContactModal').classList.remove('show');
+      pendingAnswerKey = null;
+    }
+
+    async function submitAutoContact() {
+      const contact = document.getElementById('autoContactInput').value.trim();
+      if (!contact) {
+        showToast('请输入微信号或电话');
+        document.getElementById('autoContactInput').focus();
+        return;
+      }
+      const savedKey = pendingAnswerKey;
+      document.getElementById('autoContactInput').value = '';
+      closeAutoModal();
+      submittedOnce = true;
+
+      await addMsg(escapeHtml(contact), 'user', 0);
+      addTyping();
+      await new Promise(r => setTimeout(r, 1000));
+      removeTyping();
+
+      // 如果是从挽留问题来的,先把对应答案发出来
+      if (savedKey && exitAnswers[savedKey]) {
+        await addMsg(exitAnswers[savedKey].agentMsg, 'agent', 0);
+        await new Promise(r => setTimeout(r, 300));
+      }
+
+      await addMsg('收到!Mandy 已收到您的联系方式,5 分钟内主动加您 ✓', 'agent', 0);
+      await submitLead(contact);
+    }
+
+    // ===== 功能 2: 退出/返回时挽留(只弹一次) =====
+    let exitModalShownEver = false;  // 整个会话中是否弹过 — 弹过就不再弹
+    let exitModalOpen = false;
+    let userConfirmedExit = false;
+
+    // 给浏览器历史加一个"假状态"
+    history.pushState({page: 'chat'}, '', location.href);
+
+    window.addEventListener('popstate', (e) => {
+      if (userConfirmedExit) return;
+      if (exitModalShownEver) {
+        // 已经弹过一次,放客户走
+        userConfirmedExit = true;
+        return;
+      }
+      // 第一次按返回 — 弹挽留窗
+      showExitModal();
+      history.pushState({page: 'chat'}, '', location.href);
+    });
+
+    // 桌面浏览器关闭/刷新拦截(只能显示标准提示)
+    window.addEventListener('beforeunload', (e) => {
+      if (!submittedOnce && !userConfirmedExit) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    });
+
+    function showExitModal() {
+      document.getElementById('exitModal').classList.add('show');
+      exitModalOpen = true;
+      exitModalShownEver = true;
+      if (window.gtag) {
+        gtag('event', 'exit_intent', { event_category: 'chat' });
+      }
+    }
+
+    function closeExitModal() {
+      document.getElementById('exitModal').classList.remove('show');
+      exitModalOpen = false;
+    }
+
+    function confirmExit() {
+      userConfirmedExit = true;
+      closeExitModal();
+      history.back();
+    }
+
+    // ===== 功能 3: 挽留弹窗 3 个问题 =====
+    const exitAnswers = {
+      cheapest: {
+        userMsg: '哪个国家代孕最便宜?',
+        agentMsg:
+          '💰 <strong>性价比从低到高:</strong><br><br>' +
+          '🇨🇳 <strong>国内方案 9 万美金全包</strong>(含试管/代孕妈妈/法律/翻译,无隐性收费)<br>' +
+          '🇰🇿 哈萨克斯坦约 8-10 万美金<br>' +
+          '🇬🇪 格鲁吉亚约 10-12 万美金<br>' +
+          '🇺🇸 美国 18-22 万美金(最贵)<br><br>' +
+          '加我微信,我把详细费用拆解表发您 ↓'
+      },
+      fastest: {
+        userMsg: '哪个国家代孕最快?',
+        agentMsg:
+          '⏰ <strong>从签约到抱娃的时间:</strong><br><br>' +
+          '🇨🇳 国内方案 <strong>最快 13 个月</strong>(流程最简化)<br>' +
+          '🇰🇿 哈萨克斯坦 14-16 个月<br>' +
+          '🇬🇪 格鲁吉亚 15-17 个月<br>' +
+          '🇺🇸 美国 14-18 个月(看州法律)<br><br>' +
+          '您要尽快开始?加我微信,先帮您评估身体条件 ↓'
+      },
+      value: {
+        userMsg: '哪个国家性价比最高?',
+        agentMsg:
+          '⚖️ <strong>综合价格 + 时间 + 法律保障 + 成功率:</strong><br><br>' +
+          '🇨🇳 <strong>国内方案性价比第一</strong>:9 万美金 / 13 个月 / 中文沟通 / 距离近<br>' +
+          '🇺🇸 美国稳妥但贵,适合追求绝对保障的客户<br>' +
+          '🇰🇿/🇬🇪 海外方案适合特殊需求(同志/单身)<br><br>' +
+          '我给您发一份《4 国对比表》,加微信看 ↓'
+      }
+    };
+
+    // 添加问题简短标签,用于留资框副标题
+    exitAnswers.cheapest.shortLabel = '【最便宜国家】';
+    exitAnswers.fastest.shortLabel = '【最快国家】';
+    exitAnswers.value.shortLabel = '【性价比最高】';
+
+    async function askExit(key) {
+      const data = exitAnswers[key];
+      if (!data) return;
+      closeExitModal();
+      // 把问题作为客户消息插入聊天
+      await addMsg(data.userMsg, 'user', 0);
+      // 📨 邮件通知:客户点击了挽留问题(高意向信号!)
+      notifyMessage(data.userMsg, '⚠️ 退出挽留 · 客户已感兴趣!');
+      // 记下来,提交联系方式后再发详细答案
+      pendingAnswerKey = key;
+      // 立刻弹留资框
+      openContactModal(
+        '✨ Mandy 已为您准备 ' + data.shortLabel + ' 的详细分析<br>' +
+        '留下微信/电话,立刻发您 + 免费方案评估'
+      );
+
+      if (window.gtag) {
+        gtag('event', 'exit_question', { event_category: 'chat', event_label: key });
+      }
+    }
+
+    // 兜底:30 秒还在页面 = 算个浅转化
+    setTimeout(() => {
+      if (!submittedOnce && window.gtag) {
+        gtag('event', 'engaged_chat', {
+          event_category: 'chat',
+          event_label: 'stayed_30s'
+        });
+      }
+    }, 30000);
+
+    // Enter 提交 auto contact 框
+    document.getElementById('autoContactInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitAutoContact();
+    });
   </script>
 </body>
 </html>
