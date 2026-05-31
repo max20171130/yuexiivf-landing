@@ -605,16 +605,28 @@ function trackConversion(label) {
 }
 
 function copyWechat() {
+  // 1) 同步 execCommand 先复制 — 保证在 weixin:// 跳转前已完成
+  let ok = false;
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = WX;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, WX.length);
+    ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch(e) {}
+  // 2) 异步 clipboard API 加固(部分新浏览器要求)
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(WX).then(showCopied).catch(fallbackCopy);
-  } else { fallbackCopy(); }
-}
-function fallbackCopy() {
-  const ta = document.createElement('textarea');
-  ta.value = WX; document.body.appendChild(ta);
-  ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    navigator.clipboard.writeText(WX).catch(() => {});
+  }
   showCopied();
 }
+function fallbackCopy() { copyWechat(); }
 function showCopied() {
   const hint = document.getElementById('copyHint');
   if (hint) { hint.classList.add('show'); setTimeout(() => hint.classList.remove('show'), 3500); }
