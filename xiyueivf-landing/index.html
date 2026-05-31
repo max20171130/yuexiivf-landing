@@ -632,7 +632,7 @@
 
     <!-- 底部 3 按钮 -->
     <div class="action-bar">
-      <div class="action-hint">不想填问卷？点「加微信」会自动打开微信 APP，粘贴搜索即可</div>
+      <div class="action-hint">点「加微信」自动打开微信 APP,微信号已复制好</div>
       <div class="action-row">
         <button class="action-btn btn-wechat" onclick="addWechat()">
           <span class="icon">💬</span>
@@ -1043,13 +1043,14 @@
       if (window.gtag) gtag('event', 'exit_question', { event_category: 'lp', event_label: key });
     }
 
-    // ============ 加微信（复制+唤起微信APP+转化追踪） ============
+    // ============ 加微信（复制+立即唤起微信APP+转化追踪） ============
     function addWechat() {
       const wxid = 'ATR20188';
-      // 先复制
-      copyText(wxid, '微信号 ATR20188 已复制 → 粘贴到搜索框加好友');
 
-      // 触发 Google Ads 转化（加微信意向）
+      // 1) 复制(异步,不阻塞)
+      copyText(wxid, '微信号 ATR20188 已复制,正在打开微信...');
+
+      // 2) 触发 Google Ads 转化(同步)
       const txnId = 'lp_chat_wx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
       if (window.gtag) {
         gtag('event', 'conversion', {
@@ -1065,21 +1066,17 @@
         });
       }
 
-      // 自动唤起微信 APP — 多重方法保证成功率
-      setTimeout(() => {
-        // 方法 1: window.location 直接跳转(iOS Safari/Chrome 最可靠)
-        try { window.location.href = 'weixin://'; } catch(e) {}
-        // 方法 2: 隐藏 iframe 兜底(Android/旧浏览器)
-        setTimeout(() => {
-          try {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = 'weixin://';
-            document.body.appendChild(iframe);
-            setTimeout(() => iframe.remove(), 1000);
-          } catch(e) {}
-        }, 100);
-      }, 500);
+      // 3) 立即唤起微信 APP — 必须在用户手势同步内执行,iOS 才放行
+      // iframe 兜底 Android/旧浏览器
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = 'weixin://';
+        document.body.appendChild(iframe);
+        setTimeout(() => iframe.remove(), 1500);
+      } catch(e) {}
+      // 同步 navigation — 关键:在 click handler 同步内才能成功
+      try { window.location.href = 'weixin://'; } catch(e) {}
     }
 
     // ============ 拨打电话 ============
