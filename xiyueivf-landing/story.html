@@ -600,7 +600,17 @@ aside .side { position: sticky; top: 70px; align-self: start; }
 const WX = 'xinglinxianshen';
 
 function trackConversion(label) {
-  try { gtag('event', 'conversion', { 'send_to': 'AW-18163080541/' + (label || 'wechat') }); } catch(e) {}
+  // 沿用 index.html 同款真实标签 → Smart Bidding 能学习"微信复制 = 优质用户"
+  const txnId = 'story_' + (label || 'wx') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  try {
+    gtag('event', 'conversion', {
+      'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+      'value': 1.0,
+      'currency': 'USD',
+      'transaction_id': txnId
+    });
+    gtag('event', 'wechat_copy', { event_category: 'engagement', event_label: 'story_landing', transaction_id: txnId });
+  } catch(e) {}
 }
 
 function copyWechat() {
