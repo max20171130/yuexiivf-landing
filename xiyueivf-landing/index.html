@@ -693,9 +693,9 @@
 
       <!-- 联系方式 -->
       <div class="quiz-q" data-q="contact" style="margin-bottom: 6px;">
-        <div class="q-label"><span class="q-num">+</span> 留个微信号 · 顾问 1 对 1 私聊给你定方案<span class="req-star">* 必填</span></div>
-        <input class="age-input" id="contactInput" style="max-width: none;" placeholder="微信号 或 电话，方便顾问主动联系你" />
-        <div class="error-tip" id="contactErrorTip">⚠️ 请填写您的微信号或电话,否则顾问无法联系您</div>
+        <div class="q-label"><span class="q-num">+</span> 留个微信 / 电话 / 邮箱 · 顾问 1 对 1 私聊给你定方案<span class="req-star">* 必填</span></div>
+        <input class="age-input" id="contactInput" style="max-width: none;" placeholder="微信号 / 电话 / 邮箱，三选一，方便顾问主动联系你" />
+        <div class="error-tip" id="contactErrorTip">⚠️ 请填写您的微信 / 电话 / 邮箱(三选一),否则顾问无法联系您</div>
       </div>
 
       <button class="submit-quiz" id="submitQuiz" onclick="submitQuiz()">深入剖析 · 给我最适合的方案 →</button>
@@ -742,8 +742,8 @@
     <div class="contact-modal-card">
       <button class="contact-modal-close" onclick="closeContactModal()">×</button>
       <div class="contact-modal-title">📞 获取专属代孕方案</div>
-      <div class="contact-modal-sub">留下您的微信号或电话<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估</div>
-      <input type="text" class="contact-modal-input" id="contactModalInput" placeholder="请输入微信号或电话" autocomplete="off">
+      <div class="contact-modal-sub">留下您的微信 / 电话 / 邮箱(三选一)<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估</div>
+      <input type="text" class="contact-modal-input" id="contactModalInput" placeholder="请输入微信号 / 电话 / 邮箱" autocomplete="off">
       <button class="contact-modal-submit" onclick="submitContactModal()">立即获取方案 ➤</button>
       <a class="contact-modal-dismiss" onclick="closeContactModal()">暂不需要</a>
     </div>
@@ -819,7 +819,7 @@
         <div class="inline-cta">
           <button class="inline-cta-btn primary" onclick="addWechat()">💬 复制微信 ATR20188</button>
           <button class="inline-cta-btn primary" onclick="callPhone('13822192921')">📞 复制电话</button>
-          <button class="inline-cta-btn" onclick="openContactModal()">✏️ 留下我的微信/电话</button>
+          <button class="inline-cta-btn" onclick="openContactModal()">✏️ 留下我的微信/电话/邮箱</button>
         </div>
         <div class="inline-qr" onclick="qrClicked()">
           <img class="inline-qr-img" src="qr-wx.png" alt="加微信 ATR20188" />
@@ -1009,7 +1009,7 @@
       if (customSubtitle && subEl) {
         subEl.innerHTML = customSubtitle;
       } else if (subEl) {
-        subEl.innerHTML = '留下您的微信号或电话<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估';
+        subEl.innerHTML = '留下您的微信 / 电话 / 邮箱(三选一)<br>Mandy 顾问 5 分钟内主动联系您 · 免费方案评估';
       }
       document.getElementById('contactModal').classList.add('show');
       setTimeout(() => document.getElementById('contactModalInput').focus(), 200);
@@ -1026,7 +1026,7 @@
         void input.offsetWidth;
         input.classList.add('error-required', 'error-shake');
         setTimeout(() => input.classList.remove('error-shake'), 550);
-        showToast('请先填写您的微信号或电话 ✏️');
+        showToast('请先填写您的微信 / 电话 / 邮箱 ✏️');
         setTimeout(() => input.focus(), 200);
         return;
       }
@@ -1171,7 +1171,7 @@
       // 立即弹留资框,副标题动态变成对应问题
       openContactModal(
         '✨ Mandy 已为您准备 <strong>' + data.label + '</strong> 的详细分析<br>' +
-        '留下微信/电话,立刻发您 + 免费方案评估'
+        '留下微信/电话/邮箱,立刻发您 + 免费方案评估'
       );
       if (window.gtag) gtag('event', 'exit_question', { event_category: 'lp', event_label: key });
     }
