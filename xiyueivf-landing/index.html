@@ -511,6 +511,40 @@
       margin-bottom: 12px;
     }
     .contact-modal-input:focus { border-color: #07c160; background: #fff; }
+    /* 联系方式必填 — 强校验视觉(抖动 + 红边) */
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .error-shake { animation: shakeError 0.5s ease-in-out; }
+    .error-required {
+      border-color: #ff4444 !important;
+      background: #fff5f5 !important;
+      box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.18) !important;
+    }
+    .error-tip {
+      color: #ff4444;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin: 6px 0 0;
+      padding-left: 4px;
+      display: none;
+    }
+    .error-tip.show { display: block; animation: shakeError 0.5s; }
+    .req-star {
+      color: #ff4444;
+      font-size: 11px;
+      font-weight: 700;
+      background: #fff0f0;
+      border: 1px solid #ffcccc;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
     .contact-modal-submit {
       background: #07c160;
       color: #fff;
@@ -659,8 +693,9 @@
 
       <!-- 联系方式 -->
       <div class="quiz-q" data-q="contact" style="margin-bottom: 6px;">
-        <div class="q-label"><span class="q-num">+</span> 留个微信号 · 顾问 1 对 1 私聊给你定方案</div>
+        <div class="q-label"><span class="q-num">+</span> 留个微信号 · 顾问 1 对 1 私聊给你定方案<span class="req-star">* 必填</span></div>
         <input class="age-input" id="contactInput" style="max-width: none;" placeholder="微信号 或 电话，方便顾问主动联系你" />
+        <div class="error-tip" id="contactErrorTip">⚠️ 请填写您的微信号或电话,否则顾问无法联系您</div>
       </div>
 
       <button class="submit-quiz" id="submitQuiz" onclick="submitQuiz()">深入剖析 · 给我最适合的方案 →</button>
@@ -861,17 +896,43 @@
         contactQ.classList.add('q-show');
       }
     });
+    // 用户一开始打字就清掉错误状态(红边/抖动/红字提示)
+    document.getElementById('contactInput').addEventListener('input', (e) => {
+      if (e.target.value.trim()) {
+        e.target.classList.remove('error-required', 'error-shake');
+        const tip = document.getElementById('contactErrorTip');
+        if (tip) tip.classList.remove('show');
+      }
+    });
 
     function submitQuiz() {
-      const contact = document.getElementById('contactInput').value.trim();
+      const contactInput = document.getElementById('contactInput');
+      const contact = contactInput.value.trim();
+      const errorTip = document.getElementById('contactErrorTip');
 
-      // 完全空提交时,提示用户至少填联系方式（不强制阻塞）
-      const anyAnswerFilled = Object.keys(answers).length > 0;
-      if (!contact && !anyAnswerFilled) {
-        showToast('至少留个微信号方便顾问联系你 🙏');
-        document.getElementById('contactInput').focus();
+      // ★ 联系方式必填强校验 — 空就一律拦截(抖动 + 红边 + 红色提示 + 滚动 + focus)
+      if (!contact) {
+        // 确保 contact 题目展开 + 滚到视野
+        const contactQ = document.querySelector('.quiz-q[data-q="contact"]');
+        if (contactQ) {
+          contactQ.classList.remove('q-hidden');
+          contactQ.classList.add('q-show');
+          contactQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // 重置动画 + 触发抖动
+        contactInput.classList.remove('error-shake');
+        if (errorTip) errorTip.classList.remove('show');
+        void contactInput.offsetWidth;
+        contactInput.classList.add('error-required', 'error-shake');
+        if (errorTip) errorTip.classList.add('show');
+        setTimeout(() => contactInput.classList.remove('error-shake'), 550);
+        showToast('请先填写联系方式 ✏️');
+        setTimeout(() => contactInput.focus(), 350);
         return;
       }
+      // 校验通过 — 清除错误状态
+      contactInput.classList.remove('error-required', 'error-shake');
+      if (errorTip) errorTip.classList.remove('show');
 
       // 1) 发邮件 (Web3Forms — 与 yuexihui.org/consult.html 共用 access_key,已激活)
       // 用英文字段名避免邮件里中文乱码
@@ -957,12 +1018,19 @@
       document.getElementById('contactModal').classList.remove('show');
     }
     function submitContactModal() {
-      const contact = document.getElementById('contactModalInput').value.trim();
+      const input = document.getElementById('contactModalInput');
+      const contact = input.value.trim();
       if (!contact) {
-        showToast('请输入您的微信号或电话');
-        document.getElementById('contactModalInput').focus();
+        // 强校验视觉反馈(抖动 + 红边)
+        input.classList.remove('error-shake');
+        void input.offsetWidth;
+        input.classList.add('error-required', 'error-shake');
+        setTimeout(() => input.classList.remove('error-shake'), 550);
+        showToast('请先填写您的微信号或电话 ✏️');
+        setTimeout(() => input.focus(), 200);
         return;
       }
+      input.classList.remove('error-required', 'error-shake');
       // 走跟问卷一样的提交逻辑(Web3Forms 邮件 + Google Ads 转化)
       const exitInfo = exitPending && exitAnswers[exitPending]
         ? '⚠️ 从退出挽留 ' + exitAnswers[exitPending].label + ' 问题来\n' +
@@ -1001,7 +1069,13 @@
     // Enter 提交
     document.addEventListener('DOMContentLoaded', () => {
       const inp = document.getElementById('contactModalInput');
-      if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitContactModal(); });
+      if (inp) {
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitContactModal(); });
+        // 用户一开始打字就清掉红边/抖动错误状态
+        inp.addEventListener('input', (e) => {
+          if (e.target.value.trim()) e.target.classList.remove('error-required', 'error-shake');
+        });
+      }
     });
 
     // ============ 退出挽留弹窗(只弹一次) ============
