@@ -162,7 +162,7 @@
   }
   .qr-box {
     flex-shrink: 0;
-    padding: 10px;
+    padding: 5px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(60,40,10,0.10);
@@ -172,8 +172,8 @@
   }
   .qr-box img {
     display: block;
-    width: 180px;
-    height: 180px;
+    width: 190px;
+    height: 190px;
     border-radius: 6px;
   }
   .contact-text {
@@ -234,17 +234,18 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Mono", Consolas, monospace;
     white-space: nowrap;
   }
-  .phone-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .phone-btn-row { display: flex; gap: 6px; flex-wrap: nowrap; }
   .phone-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 12px;
     background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
     color: #fff; border: none; border-radius: 100px;
-    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; text-decoration: none;
     box-shadow: 0 3px 10px rgba(184,134,11,0.25);
     transition: transform 0.15s, box-shadow 0.15s;
     font-family: inherit;
+    white-space: nowrap;
   }
   .phone-btn:active { transform: translateY(1px); }
   .phone-btn:hover { box-shadow: 0 5px 14px rgba(184,134,11,0.35); }
@@ -257,8 +258,8 @@
   /* ===== 价格醒目标签(联系区右侧) ===== */
   .price-highlight {
     flex-shrink: 0;
-    width: 200px;
-    padding: 18px 14px;
+    width: 210px;
+    padding: 14px 12px;
     background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
     border-radius: 16px;
     color: #fff;
@@ -269,7 +270,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+    align-self: stretch;
   }
   .price-highlight::before {
     content: "限时";
@@ -287,13 +289,13 @@
     border: 2px solid #fff;
   }
   .price-tag-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 2px;
     color: #fff8d4;
   }
   .price-num {
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 800;
     letter-spacing: 0;
     line-height: 1.1;
@@ -301,22 +303,22 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.18);
     font-family: -apple-system, BlinkMacSystemFont, "SF Mono", Consolas, monospace;
   }
-  .price-num .currency { font-size: 16px; vertical-align: 4px; margin-right: 2px; }
-  .price-num .qi { font-size: 14px; font-weight: 600; margin-left: 4px; letter-spacing: 2px; }
+  .price-num .currency { font-size: 19px; vertical-align: 5px; margin-right: 2px; }
+  .price-num .qi { font-size: 16px; font-weight: 600; margin-left: 4px; letter-spacing: 2px; }
   .price-promise {
     display: inline-block;
     background: #d83a25;
     color: #fff;
-    padding: 4px 12px;
+    padding: 6px 16px;
     border-radius: 100px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     letter-spacing: 2px;
     box-shadow: 0 3px 8px rgba(216,58,37,0.30);
     align-self: center;
   }
   .price-refund {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 800;
     color: #1a1408;
     letter-spacing: 1px;
@@ -475,11 +477,46 @@
     background: linear-gradient(135deg, #d4af37 0%, #f4d56d 100%);
     color: #1a1408;
     border-radius: 100px;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     letter-spacing: 2px;
     text-decoration: none;
     box-shadow: 0 6px 18px rgba(244,213,109,0.40);
+  }
+  .bottom-contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .bottom-qr {
+    width: 130px;
+    height: 130px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 6px;
+    box-shadow: 0 6px 18px rgba(244,213,109,0.25);
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  .bottom-info { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .bottom-cta .big-phone {
+    display: inline-block;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #2ea043 0%, #1f7c34 100%);
+    color: #fff;
+    border-radius: 100px;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(46,160,67,0.40);
+  }
+  @media (max-width: 600px) {
+    .bottom-contact { flex-direction: column; gap: 18px; }
+    .bottom-cta .big-wechat, .bottom-cta .big-phone { font-size: 14px; padding: 12px 26px; letter-spacing: 1.5px; }
   }
 
   /* 页脚 */
@@ -848,7 +885,7 @@
           <li>可<strong>供卵供精</strong>;PGT-A 三代试管 染色体筛查</li>
           <li><strong>代孕费用 7 万美金起</strong>,按不同阶段付款</li>
           <li><strong>不成功退款</strong>,签订正规合同保障</li>
-          <li>中国 / 美国加州 / 哈萨克斯坦 <strong>试管代孕多方案可选</strong></li>
+          <li><span style="background:linear-gradient(90deg,#d83a25 0%,#c52d18 100%);color:#fff;padding:3px 10px;border-radius:5px;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 4px rgba(216,58,37,0.25);">中国 / 美国加州 / 哈萨克斯坦</span> <strong>试管代孕多方案可选</strong></li>
         </ul>
         <div class="side-closing">
           <span class="h-gold">中国国内代孕机构</span>(<span class="h-city">北京 · 广州 · 上海 · 深圳</span>),<span class="h-gold">美国代孕公司</span>、<span class="h-gold">哈萨克斯坦代孕机构</span>,<span class="h-red-big">最低代孕费用 $70,000 起</span>,<span class="h-red">可选性别</span>,<span class="h-blue">多国捐卵志愿者库</span>。<br><br>搜索 <span class="h-wechat">ATR20188</span> 添加我们的专业生殖顾问 <span class="h-orange">免费咨询</span>。
@@ -864,19 +901,19 @@
       <p class="section-sub">美国代孕 · 加州代孕 · 试管代孕 · 多种代孕方案按需定制</p>
       <div class="service-grid">
         <div class="service-card">
-          <div class="service-icon">🗽</div>
+          <div class="service-icon">🇨🇳</div>
+          <div class="service-name">中国代孕</div>
+          <div class="service-desc">国内资深团队 + 主要城市顾问对接 + 全程服务陪同</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🇺🇸</div>
           <div class="service-name">美国代孕</div>
           <div class="service-desc">美国代孕机构直营,加州知名医院 + 美国宝宝身份</div>
         </div>
         <div class="service-card">
-          <div class="service-icon">🌴</div>
-          <div class="service-name">加州代孕</div>
-          <div class="service-desc">加州顶级医疗 + 资深律师 + 全套合同保障</div>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">🧬</div>
-          <div class="service-name">试管代孕</div>
-          <div class="service-desc">PGT-A 三代试管 + 染色体筛查 + 健康胚胎移植</div>
+          <div class="service-icon">🇰🇿</div>
+          <div class="service-name">哈萨克斯坦代孕</div>
+          <div class="service-desc">阿拉木图自营门诊 + 合作三甲医院 + 多语言陪护</div>
         </div>
         <div class="service-card">
           <div class="service-icon">🥚</div>
@@ -913,20 +950,20 @@
         </thead>
         <tbody>
           <tr>
-            <td>试管代孕(基础方案)</td>
-            <td class="price-cell">$70,000 起</td>
+            <td>🇨🇳 中国代孕</td>
+            <td class="price-cell">8 - 11 万美金</td>
           </tr>
           <tr>
-            <td>美国代孕价格(标准方案)</td>
-            <td class="price-cell">$120,000 - $150,000</td>
+            <td>🇺🇸 美国代孕</td>
+            <td class="price-cell">15 - 20 万美金</td>
           </tr>
           <tr>
-            <td>加州代孕(高端全套)</td>
-            <td class="price-cell">$150,000 - $180,000</td>
+            <td>🇰🇿 哈萨克斯坦代孕</td>
+            <td class="price-cell">7 - 9 万美金</td>
           </tr>
           <tr>
-            <td>供卵 + 试管代孕组合</td>
-            <td class="price-cell">+ $30,000 - $50,000</td>
+            <td>🥚 供卵费用</td>
+            <td class="price-cell">1 万美金起</td>
           </tr>
         </tbody>
       </table>
@@ -998,8 +1035,14 @@
     <!-- 底部 CTA -->
     <div class="bottom-cta">
       <h2>免费咨询 · 一对一定制方案</h2>
-      <p>添加微信 / 扫描上方二维码 · 资深生殖顾问 24h 在线</p>
-      <a href="javascript:copyWechat()" class="big-wechat">微信:ATR20188 (点击复制)</a>
+      <p>扫描二维码 / 添加微信 / 拨打电话 · 资深生殖顾问 24h 在线</p>
+      <div class="bottom-contact">
+        <img src="qr-wx.png" alt="微信二维码 ATR20188" class="bottom-qr" />
+        <div class="bottom-info">
+          <a href="javascript:copyWechat()" class="big-wechat">📱 微信:ATR20188(点击复制)</a>
+          <a href="javascript:copyPhone()" class="big-phone">📞 电话:198 7804 3732(点击复制)</a>
+        </div>
+      </div>
     </div>
 
     <div class="footer">
@@ -1014,9 +1057,16 @@
 <script>
   function copyWechat() {
     const text = 'ATR20188';
-    const msg = '✓ 微信号 ATR20188 已复制';
+    const msg = '✓ 已复制 ATR20188 · 正在打开微信...';
+    function onCopied() {
+      showToast(msg);
+      // 延迟 700ms 跳转微信(让 toast 显示)
+      setTimeout(() => {
+        try { window.location.href = 'weixin://'; } catch(e) {}
+      }, 700);
+    }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(fallback);
+      navigator.clipboard.writeText(text).then(onCopied).catch(fallback);
     } else { fallback(); }
     function fallback() {
       const ta = document.createElement('textarea');
@@ -1025,7 +1075,7 @@
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); showToast(msg); }
+      try { document.execCommand('copy'); onCopied(); }
       catch(e) { alert('请手动复制: ' + text); }
       document.body.removeChild(ta);
     }
