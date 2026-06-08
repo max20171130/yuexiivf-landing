@@ -213,6 +213,40 @@
   .copy-btn:active { transform: translateY(1px); }
   .copy-btn:hover { box-shadow: 0 6px 16px rgba(184,134,11,0.40); }
 
+  /* ===== 电话区 ===== */
+  .phone-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed #f0e4c8;
+  }
+  .phone-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1a1408;
+    letter-spacing: 2px;
+    margin: 4px 0 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Mono", Consolas, monospace;
+  }
+  .phone-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .phone-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+    color: #fff; border: none; border-radius: 100px;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 3px 10px rgba(184,134,11,0.25);
+    transition: transform 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+  .phone-btn:active { transform: translateY(1px); }
+  .phone-btn:hover { box-shadow: 0 5px 14px rgba(184,134,11,0.35); }
+  .phone-btn.call {
+    background: linear-gradient(135deg, #2ea043 0%, #1f7c34 100%);
+    box-shadow: 0 3px 10px rgba(46,160,67,0.30);
+  }
+  .phone-btn.call:hover { box-shadow: 0 5px 14px rgba(46,160,67,0.40); }
+
   /* ===== 价格醒目标签(联系区右侧) ===== */
   .price-highlight {
     flex-shrink: 0;
@@ -765,7 +799,7 @@
         <!-- 联系区 -->
         <div class="contact-row">
           <div class="qr-box">
-            <img src="qr-author.jpg" alt="微信二维码 ATR20188" />
+            <img src="qr-wx.png" alt="微信二维码 ATR20188" />
           </div>
           <div class="contact-text">
             <div class="contact-label">📱 微信号</div>
@@ -773,6 +807,18 @@
             <button class="copy-btn" onclick="copyWechat()">
               <span>📋</span><span>复制微信号</span>
             </button>
+            <div class="phone-section">
+              <div class="contact-label">📞 电话</div>
+              <div class="phone-num">198 7804 3732</div>
+              <div class="phone-btn-row">
+                <a href="tel:19878043732" class="phone-btn call">
+                  <span>📞</span><span>拨打</span>
+                </a>
+                <button class="phone-btn" onclick="copyPhone()">
+                  <span>📋</span><span>复制电话</span>
+                </button>
+              </div>
+            </div>
           </div>
           <!-- 价格醒目标签(红框位置) -->
           <div class="price-highlight">
@@ -961,8 +1007,9 @@
 <script>
   function copyWechat() {
     const text = 'ATR20188';
+    const msg = '✓ 微信号 ATR20188 已复制';
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(showToast).catch(fallback);
+      navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(fallback);
     } else { fallback(); }
     function fallback() {
       const ta = document.createElement('textarea');
@@ -971,15 +1018,34 @@
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); showToast(); }
+      try { document.execCommand('copy'); showToast(msg); }
       catch(e) { alert('请手动复制: ' + text); }
       document.body.removeChild(ta);
     }
   }
-  function showToast() {
+  function showToast(msg) {
     const toast = document.getElementById('toast');
+    if (msg) toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 1800);
+    setTimeout(() => { toast.classList.remove('show'); }, 1800);
+  }
+  function copyPhone() {
+    const text = '19878043732';
+    const msg = '✓ 电话 198 7804 3732 已复制';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(fb);
+    } else { fb(); }
+    function fb() {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast(msg); }
+      catch(e) { alert('请手动复制: ' + text); }
+      document.body.removeChild(ta);
+    }
   }
 </script>
 </body>
