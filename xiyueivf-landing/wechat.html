@@ -8,6 +8,20 @@
 <meta name="theme-color" content="#1a1408">
 <meta name="robots" content="noindex, nofollow">
 <meta name="googlebot" content="noindex, nofollow">
+
+<!-- ClickCease 反点击欺诈跟踪 -->
+<script async src="https://ob.belvionetta.com/i/9d31b2c4947a0f37cb4890f833142cf7.js" class="ct_clicktrue"></script>
+
+<!-- Google Ads + GA4 转化追踪(跟 index.html 同账号) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18163080541"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-18163080541');
+  gtag('config', 'G-PJ0KE3HLJF');
+</script>
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-text-size-adjust: 100%; }
@@ -801,6 +815,61 @@
     .coverage-title { font-size: 14px; }
     .cov-chip { font-size: 12.5px; padding: 6px 12px; }
   }
+
+  /* ===== 底部 3 按钮飘窗(固定底部 + Google Ads 转化点) ===== */
+  body { padding-bottom: 96px; }
+  .action-bar {
+    background: #f7f7f7;
+    border-top: 1px solid #e0e0e0;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 80;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  }
+  .action-hint {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    padding: 2px 0;
+  }
+  .action-row {
+    display: flex;
+    gap: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .action-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 4px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: transform 0.1s;
+    white-space: nowrap;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .action-btn:active { transform: scale(0.96); }
+  .action-btn .icon { font-size: 18px; line-height: 1; }
+  .btn-wechat { background: #07c160; color: #fff; }
+  .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
+  .btn-form { background: #ff9933; color: #fff; }
 </style>
 </head>
 <body>
@@ -1054,19 +1123,49 @@
 
   <div class="toast" id="toast">✓ 微信号 ATR20188 已复制</div>
 
+  <!-- ===== 底部 3 按钮(固定屏幕底部) ===== -->
+  <div class="action-bar">
+    <div class="action-hint">点「加微信」自动打开微信 APP,微信号已复制好</div>
+    <div class="action-row">
+      <button class="action-btn btn-wechat" onclick="addWechat()">
+        <span class="icon">💬</span>
+        <span>加微信</span>
+      </button>
+      <a class="action-btn btn-phone" href="tel:19878043732" onclick="trackPhoneCall()">
+        <span class="icon">📞</span>
+        <span>拨打电话</span>
+      </a>
+      <button class="action-btn btn-form" onclick="getPlan()">
+        <span class="icon">📝</span>
+        <span>获取代孕方案</span>
+      </button>
+    </div>
+  </div>
+
 <script>
-  function copyWechat() {
-    const text = 'ATR20188';
-    const msg = '✓ 已复制 ATR20188 · 正在打开微信...';
-    function onCopied() {
-      showToast(msg);
-      // 延迟 700ms 跳转微信(让 toast 显示)
-      setTimeout(() => {
-        try { window.location.href = 'weixin://'; } catch(e) {}
-      }, 700);
+  // ============ Google Ads 转化追踪通用函数 ============
+  function fireConversion(label) {
+    const txnId = 'lp_wechat_' + label + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    if (window.gtag) {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+        'value': 1.0,
+        'currency': 'USD',
+        'transaction_id': txnId
+      });
+      gtag('event', 'generate_lead', {
+        event_category: 'engagement',
+        event_label: 'wechat_landing_' + label,
+        transaction_id: txnId
+      });
     }
+    return txnId;
+  }
+
+  // 通用复制
+  function copyTextOnly(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(onCopied).catch(fallback);
+      navigator.clipboard.writeText(text).catch(fallback);
     } else { fallback(); }
     function fallback() {
       const ta = document.createElement('textarea');
@@ -1075,10 +1174,45 @@
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); onCopied(); }
-      catch(e) { alert('请手动复制: ' + text); }
+      try { document.execCommand('copy'); }
+      catch(e) {}
       document.body.removeChild(ta);
     }
+  }
+
+  // ============ 加微信(复制 + 转化追踪 + 唤起微信 APP) ============
+  function addWechat() {
+    copyTextOnly('ATR20188');
+    fireConversion('wechat');
+    showToast('✓ 微信号 ATR20188 已复制 · 正在打开微信...');
+    // 同步唤起微信(必须在 click 同步内,iOS 才放行)
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = 'weixin://';
+      document.body.appendChild(iframe);
+      setTimeout(() => iframe.remove(), 1500);
+    } catch(e) {}
+    try { window.location.href = 'weixin://'; } catch(e) {}
+  }
+
+  // ============ 拨打电话(转化追踪)============
+  function trackPhoneCall() {
+    fireConversion('phone');
+    // a 标签的 href="tel:..." 会自动唤起拨号,不用 prevent
+  }
+
+  // ============ 获取代孕方案(同 addWechat 但 label 不同)============
+  function getPlan() {
+    copyTextOnly('ATR20188');
+    fireConversion('plan');
+    showToast('✓ 微信号 ATR20188 已复制 · 加我获取代孕方案');
+    try { window.location.href = 'weixin://'; } catch(e) {}
+  }
+
+  // ============ 兼容旧调用(contact-row 里的「复制微信号」按钮)============
+  function copyWechat() {
+    addWechat();
   }
   function showToast(msg) {
     const toast = document.getElementById('toast');
