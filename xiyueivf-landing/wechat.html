@@ -870,6 +870,50 @@
   .btn-wechat { background: #07c160; color: #fff; }
   .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
   .btn-form { background: #ff9933; color: #fff; }
+
+  /* 表单弹窗(全屏遮罩 + 同域 iframe 加载主页) */
+  .plan-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff;
+    z-index: 99999;
+    display: none;
+    flex-direction: column;
+  }
+  .plan-modal.open { display: flex; }
+  .plan-modal-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1a1408;
+    color: #fff;
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .plan-modal-title { color: #ffd166; }
+  .plan-modal-close {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .plan-modal-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+  }
 </style>
 </head>
 <body>
@@ -892,7 +936,7 @@
         </div>
 
         <h1 class="h-title">
-          代孕<span class="accent"> · </span>三代试管
+          知名代孕机构<span class="accent"> · </span>三代试管代孕
         </h1>
         <div class="h-sub">
           线上咨询 · <span class="em">18 年专注 · 1W+ 助孕案例</span>
@@ -1202,12 +1246,24 @@
     // a 标签的 href="tel:..." 会自动唤起拨号,不用 prevent
   }
 
-  // ============ 获取代孕方案(同 addWechat 但 label 不同)============
+  // ============ 获取代孕方案 — 打开弹窗加载主页表单 ============
   function getPlan() {
-    copyTextOnly('ATR20188');
-    fireConversion('plan');
-    showToast('✓ 微信号 ATR20188 已复制 · 加我获取代孕方案');
-    try { window.location.href = 'weixin://'; } catch(e) {}
+    fireConversion('plan_modal_open');
+    openPlanModal();
+  }
+  function openPlanModal() {
+    const modal = document.getElementById('planModal');
+    const frame = document.getElementById('planFrame');
+    if (!frame.src || frame.src === 'about:blank') {
+      frame.src = '/?from=wechat&utm_source=wechat_page&utm_medium=plan_btn';
+    }
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePlanModal() {
+    const modal = document.getElementById('planModal');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   // ============ 兼容旧调用(contact-row 里的「复制微信号」按钮)============
@@ -1239,5 +1295,15 @@
     }
   }
 </script>
+
+<!-- 获取代孕方案弹窗 — 内嵌主页 chat-style 表单 -->
+<div id="planModal" class="plan-modal" role="dialog" aria-modal="true" aria-label="获取代孕方案">
+  <div class="plan-modal-bar">
+    <span class="plan-modal-title">📝 获取代孕方案 · 1 分钟问答定制</span>
+    <button class="plan-modal-close" onclick="closePlanModal()" aria-label="关闭">×</button>
+  </div>
+  <iframe id="planFrame" class="plan-modal-frame" src="about:blank" loading="lazy" title="获取代孕方案表单"></iframe>
+</div>
+
 </body>
 </html>
