@@ -871,49 +871,121 @@
   .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
   .btn-form { background: #ff9933; color: #fff; }
 
-  /* 表单弹窗(全屏遮罩 + 同域 iframe 加载主页) */
+  /* 留资弹窗(强制必填 — 不填不让关) */
   .plan-modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #fff;
+    background: rgba(0,0,0,0.55);
     z-index: 99999;
     display: none;
-    flex-direction: column;
-  }
-  .plan-modal.open { display: flex; }
-  .plan-modal-bar {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #1a1408;
-    color: #fff;
-    padding: 10px 14px;
-    font-weight: 700;
-    font-size: 15px;
-    flex-shrink: 0;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
   }
-  .plan-modal-title { color: #ffd166; }
-  .plan-modal-close {
-    background: transparent;
-    color: #fff;
-    border: 1.5px solid #fff;
+  .plan-modal.open { display: flex; animation: planFadeIn 0.2s ease-out; }
+  @keyframes planFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .plan-form-card {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 380px;
+    padding: 36px 28px 24px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.30);
+    animation: planSlideUp 0.25s ease-out;
+  }
+  @keyframes planSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes planShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+  .plan-form-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f0f0f0;
+    color: #888;
     border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1;
     cursor: pointer;
-    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.15s;
   }
-  .plan-modal-frame {
-    flex: 1;
+  .plan-form-close:hover { background: #e0e0e0; color: #333; }
+  .plan-form-title {
+    font-size: 21px;
+    font-weight: 800;
+    color: #1f1f1f;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .plan-form-title .ic { color: #e44; margin-right: 4px; }
+  .plan-form-sub {
+    font-size: 13.5px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 4px;
+  }
+  .plan-input {
     width: 100%;
-    border: none;
-    background: #fff;
+    padding: 14px 18px;
+    border: 2px solid #07c160;
+    border-radius: 100px;
+    font-size: 14.5px;
+    margin: 20px 0 14px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
   }
+  .plan-input:focus {
+    border-color: #05a050;
+    box-shadow: 0 0 0 3px rgba(7,193,96,0.15);
+  }
+  .plan-submit {
+    width: 100%;
+    background: linear-gradient(135deg, #07c160 0%, #05a050 100%);
+    color: #fff;
+    padding: 15px 16px;
+    border: none;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(7,193,96,0.30);
+    transition: transform 0.1s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+  .plan-submit:active { transform: translateY(1px); }
+  .plan-submit:hover { box-shadow: 0 8px 20px rgba(7,193,96,0.40); }
+  .plan-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .plan-decline {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 12px;
+    cursor: pointer;
+    padding: 6px 12px;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .plan-decline:hover { color: #777; }
 </style>
 </head>
 <body>
@@ -1246,24 +1318,102 @@
     // a 标签的 href="tel:..." 会自动唤起拨号,不用 prevent
   }
 
-  // ============ 获取代孕方案 — 打开弹窗加载主页表单 ============
+  // ============ 获取代孕方案 — 强制留资弹窗(不填不让关) ============
   function getPlan() {
     fireConversion('plan_modal_open');
     openPlanModal();
   }
   function openPlanModal() {
     const modal = document.getElementById('planModal');
-    const frame = document.getElementById('planFrame');
-    if (!frame.src || frame.src === 'about:blank') {
-      frame.src = '/?from=wechat&utm_source=wechat_page&utm_medium=plan_btn';
-    }
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('planContactInput')?.focus(), 220);
   }
   function closePlanModal() {
     const modal = document.getElementById('planModal');
     modal.classList.remove('open');
     document.body.style.overflow = '';
+  }
+  // 点蒙层(空白区域)— 尝试关闭(但走必填校验)
+  function onPlanOverlayClick(e) {
+    if (e.target.id === 'planModal') tryClosePlan();
+  }
+  // 关闭前校验:必须填一项,否则提示 + 聚焦输入框
+  function tryClosePlan() {
+    const input = document.getElementById('planContactInput');
+    const v = (input?.value || '').trim();
+    if (!v) {
+      // 抖动 + 高亮 + toast 提示
+      const card = document.querySelector('.plan-form-card');
+      card.style.animation = 'none';
+      card.offsetHeight; // reflow
+      card.style.animation = 'planShake 0.4s';
+      input.style.borderColor = '#e44';
+      input.focus();
+      showToast('💌 请留下微信 / 电话 / 邮箱再关闭哦~');
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+      return;
+    }
+    closePlanModal();
+  }
+  // 提交表单:校验 + 发邮件到 yuyinhong2023@gmail.com(通过 FormSubmit)
+  async function submitPlanForm() {
+    const input = document.getElementById('planContactInput');
+    const btn = document.getElementById('planSubmitBtn');
+    const v = (input.value || '').trim();
+    if (!v) {
+      input.style.borderColor = '#e44';
+      input.focus();
+      showToast('请输入您的联系方式');
+      return;
+    }
+    if (v.length < 3) {
+      input.focus();
+      showToast('请输入完整的联系方式');
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '提交中…';
+    fireConversion('plan_submit');
+
+    // 检测联系方式类型(用于邮件标题)
+    let kind = '微信';
+    if (/^1[3-9]\d{9}$/.test(v.replace(/[\s\-]/g,''))) kind = '电话';
+    else if (/^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(v)) kind = '邮箱';
+
+    try {
+      // FormSubmit AJAX endpoint — 第一次提交会发激活链接到 yuyinhong2023@gmail.com,
+      // 用户点激活后,后续所有提交直接发邮件
+      const res = await fetch('https://formsubmit.co/ajax/yuyinhong2023@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          contact: v,
+          contact_type: kind,
+          source_page: 'wechat.html (悦喜汇 wechat 引流页)',
+          page_url: location.href,
+          referrer: document.referrer || '直接访问',
+          user_agent: navigator.userAgent,
+          submitted_at: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
+          _subject: '🔥 wechat.html 新留资 (' + kind + '): ' + v,
+          _template: 'box',
+          _captcha: 'false'
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      btn.innerHTML = '✓ 已提交';
+      showToast('✓ 已收到!Mandy 顾问 5 分钟内联系您');
+      setTimeout(() => {
+        closePlanModal();
+        btn.disabled = false;
+        btn.innerHTML = '立即获取方案 ➤';
+        input.value = '';
+      }, 1800);
+    } catch (e) {
+      btn.disabled = false;
+      btn.innerHTML = '立即获取方案 ➤';
+      showToast('网络异常,请直接加微信 ATR20188');
+    }
   }
 
   // ============ 兼容旧调用(contact-row 里的「复制微信号」按钮)============
@@ -1296,13 +1446,17 @@
   }
 </script>
 
-<!-- 获取代孕方案弹窗 — 内嵌主页 chat-style 表单 -->
-<div id="planModal" class="plan-modal" role="dialog" aria-modal="true" aria-label="获取代孕方案">
-  <div class="plan-modal-bar">
-    <span class="plan-modal-title">📝 获取代孕方案 · 1 分钟问答定制</span>
-    <button class="plan-modal-close" onclick="closePlanModal()" aria-label="关闭">×</button>
+<!-- 获取代孕方案弹窗 — 强制留资(不填不让关) -->
+<div id="planModal" class="plan-modal" role="dialog" aria-modal="true" aria-label="获取代孕方案" onclick="onPlanOverlayClick(event)">
+  <div class="plan-form-card" onclick="event.stopPropagation()">
+    <button class="plan-form-close" onclick="tryClosePlan()" aria-label="关闭">×</button>
+    <h3 class="plan-form-title"><span class="ic">📞</span>获取专属代孕方案</h3>
+    <p class="plan-form-sub">留下您的<strong>微信 / 电话 / 邮箱</strong>(三选一)</p>
+    <p class="plan-form-sub">Mandy 顾问 <strong style="color:#07c160;">5 分钟内</strong>主动联系您 · 免费方案评估</p>
+    <input id="planContactInput" class="plan-input" type="text" placeholder="请输入微信号 / 电话 / 邮箱" autocomplete="off" inputmode="text">
+    <button id="planSubmitBtn" class="plan-submit" onclick="submitPlanForm()">立即获取方案 ➤</button>
+    <button class="plan-decline" onclick="tryClosePlan()">暂不需要</button>
   </div>
-  <iframe id="planFrame" class="plan-modal-frame" src="about:blank" loading="lazy" title="获取代孕方案表单"></iframe>
 </div>
 
 </body>
