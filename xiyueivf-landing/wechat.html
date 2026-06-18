@@ -902,6 +902,81 @@
   .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
   .btn-form { background: #ff9933; color: #fff; }
 
+  /* ===== 横向滚动表格 — 滑动提示 + 右侧渐变 + 自定义滚动条 ===== */
+  .scroll-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 18px auto 8px;
+    padding: 7px 16px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4d56d 100%);
+    color: #1a1408;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.30);
+    white-space: nowrap;
+  }
+  .scroll-hint-wrap {
+    text-align: center;
+  }
+  .scroll-hint .swipe-arrow {
+    display: inline-block;
+    animation: swipeMove 1.4s ease-in-out infinite;
+    font-size: 14px;
+  }
+  @keyframes swipeMove {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+  }
+  .scroll-table-wrap {
+    position: relative;
+    margin: 6px 0 24px;
+  }
+  .scroll-table-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 14px;
+    right: 0;
+    width: 38px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,251,238,0.55) 50%, rgba(255,251,238,0.95) 100%);
+    border-radius: 0 12px 12px 0;
+    transition: opacity 0.25s;
+    z-index: 2;
+  }
+  .scroll-table-wrap.at-end::after { opacity: 0; }
+  .scroll-table-inner {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  /* Desktop / Chrome / iOS Safari (when active) */
+  .scroll-table-inner::-webkit-scrollbar {
+    height: 9px;
+    -webkit-appearance: none;
+  }
+  .scroll-table-inner::-webkit-scrollbar-track {
+    background: rgba(212, 175, 55, 0.18);
+    border-radius: 6px;
+    margin: 0 12px;
+  }
+  .scroll-table-inner::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+    border-radius: 6px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    min-width: 60px;
+  }
+  /* Firefox */
+  .scroll-table-inner {
+    scrollbar-color: #d4af37 rgba(212, 175, 55, 0.18);
+    scrollbar-width: thin;
+  }
+
   /* 留资弹窗(强制必填 — 不填不让关) */
   .plan-modal {
     position: fixed;
@@ -1159,7 +1234,9 @@
       <p class="section-sub">中国代孕 vs 哈萨克斯坦代孕 vs 美国代孕 · 11 项代孕费用透明对比</p>
 
       <!-- 11 项详细对比表 -->
-      <div style="overflow-x: auto; margin: 24px 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15); -webkit-overflow-scrolling: touch;">
+      <div class="scroll-hint-wrap"><div class="scroll-hint"><span>👆 左右滑动查看 3 国完整对比</span><span class="swipe-arrow">➡️</span></div></div>
+      <div class="scroll-table-wrap">
+      <div class="scroll-table-inner">
         <table style="width: 100%; border-collapse: collapse; background: #fff; font-size: 15px; min-width: 720px;">
           <thead>
             <tr style="background: linear-gradient(135deg, #1a1408 0%, #3d3220 100%); color: #f4d56d;">
@@ -1214,6 +1291,7 @@
             </tr>
           </tbody>
         </table>
+      </div>
       </div>
 
       <!-- 哪个国家代孕方案更适合我? -->
@@ -1285,7 +1363,9 @@
       <div class="section-divider"></div>
       <p class="section-sub">国内代孕 vs 海外代孕 · 5 大城市代孕公司全面对比</p>
 
-      <div style="overflow-x: auto; margin: 24px 0; border-radius: 12px; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15); -webkit-overflow-scrolling: touch;">
+      <div class="scroll-hint-wrap"><div class="scroll-hint"><span>👆 左右滑动查看 5 大城市</span><span class="swipe-arrow">➡️</span></div></div>
+      <div class="scroll-table-wrap">
+      <div class="scroll-table-inner">
         <table style="width: 100%; border-collapse: collapse; background: #fff; font-size: 15px; min-width: 720px;">
           <thead>
             <tr style="background: linear-gradient(135deg, #1a1408 0%, #3d3220 100%); color: #f4d56d;">
@@ -1348,6 +1428,7 @@
             </tr>
           </tbody>
         </table>
+      </div>
       </div>
 
       <div style="margin-top: 24px; padding: 24px 28px; background: linear-gradient(180deg, #fffbee 0%, #f8f3e8 100%); border-left: 4px solid #d4af37; border-radius: 8px; line-height: 1.95; color: #2c2418; font-size: 16px;">
@@ -1738,6 +1819,30 @@
       document.body.removeChild(ta);
     }
   }
+
+  // ============ 横向滚动表格 — 到末尾时隐藏右侧渐变 ============
+  (function setupScrollTables(){
+    function bindWrap(wrap){
+      const inner = wrap.querySelector('.scroll-table-inner');
+      if (!inner) return;
+      function updateFade(){
+        const remaining = inner.scrollWidth - inner.clientWidth - inner.scrollLeft;
+        if (remaining < 8) wrap.classList.add('at-end');
+        else wrap.classList.remove('at-end');
+      }
+      inner.addEventListener('scroll', updateFade, { passive: true });
+      window.addEventListener('resize', updateFade);
+      updateFade();
+    }
+    function init(){
+      document.querySelectorAll('.scroll-table-wrap').forEach(bindWrap);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
 </script>
 
 <!-- 代孕省钱指南弹窗 — 强制留资(不填不让关) -->
