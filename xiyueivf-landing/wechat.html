@@ -867,7 +867,38 @@
   }
   .action-btn:active { transform: scale(0.96); }
   .action-btn .icon { font-size: 18px; line-height: 1; }
-  .btn-wechat { background: #07c160; color: #fff; }
+  .btn-wechat {
+    background: linear-gradient(135deg, #07c160 0%, #06ad55 100%);
+    color: #fff;
+    flex: 1.4;
+    padding: 8px 6px;
+    gap: 1px;
+    box-shadow: 0 2px 6px rgba(7,193,96,0.25);
+  }
+  .wechat-card-label {
+    font-size: 10px;
+    opacity: 0.88;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+  }
+  .wechat-card-num {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1.15;
+    margin: 1px 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+  }
+  .wechat-card-cta {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
+    background: rgba(255,255,255,0.22);
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-top: 2px;
+  }
   .btn-phone { background: #fff; color: #1f1f1f; border: 1px solid #d0d0d0; }
   .btn-form { background: #ff9933; color: #fff; }
 
@@ -1506,16 +1537,17 @@
     <div class="action-hint">点「加微信」自动打开微信 APP,微信号已复制好</div>
     <div class="action-row">
       <button class="action-btn btn-wechat" onclick="addWechat()">
-        <span class="icon">💬</span>
-        <span>加微信</span>
+        <div class="wechat-card-label">📱 微信号</div>
+        <div class="wechat-card-num">ATR20188</div>
+        <div class="wechat-card-cta">📋 复制微信号</div>
       </button>
       <a class="action-btn btn-phone" href="tel:19878043732" onclick="trackPhoneCall()">
         <span class="icon">📞</span>
         <span>拨打电话</span>
       </a>
       <button class="action-btn btn-form" onclick="getPlan()">
-        <span class="icon">📝</span>
-        <span>获取代孕方案</span>
+        <span class="icon">💰</span>
+        <span>代孕省钱指南</span>
       </button>
     </div>
   </div>
@@ -1708,15 +1740,15 @@
   }
 </script>
 
-<!-- 获取代孕方案弹窗 — 强制留资(不填不让关) -->
-<div id="planModal" class="plan-modal" role="dialog" aria-modal="true" aria-label="获取代孕方案" onclick="onPlanOverlayClick(event)">
+<!-- 代孕省钱指南弹窗 — 强制留资(不填不让关) -->
+<div id="planModal" class="plan-modal" role="dialog" aria-modal="true" aria-label="代孕省钱指南" onclick="onPlanOverlayClick(event)">
   <div class="plan-form-card" onclick="event.stopPropagation()">
     <button class="plan-form-close" onclick="tryClosePlan()" aria-label="关闭">×</button>
-    <h3 class="plan-form-title"><span class="ic">📞</span>获取专属代孕方案</h3>
+    <h3 class="plan-form-title"><span class="ic">💰</span>代孕省钱指南 · 免费领取</h3>
     <p class="plan-form-sub">留下您的<strong>微信 / 电话 / 邮箱</strong>(三选一)</p>
-    <p class="plan-form-sub">Mandy 顾问 <strong style="color:#07c160;">5 分钟内</strong>主动联系您 · 免费方案评估</p>
+    <p class="plan-form-sub">Mandy 顾问 <strong style="color:#07c160;">5 分钟内</strong>主动联系您 · 一对一定制省钱方案</p>
     <input id="planContactInput" class="plan-input" type="text" placeholder="请输入微信号 / 电话 / 邮箱" autocomplete="off" inputmode="text">
-    <button id="planSubmitBtn" class="plan-submit" onclick="submitPlanForm()">立即获取方案 ➤</button>
+    <button id="planSubmitBtn" class="plan-submit" onclick="submitPlanForm()">立即领取指南 ➤</button>
     <button class="plan-decline" onclick="tryClosePlan()">暂不需要</button>
   </div>
 </div>
