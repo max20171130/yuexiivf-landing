@@ -938,7 +938,7 @@
     content: '';
     position: absolute;
     top: 0;
-    bottom: 14px;
+    bottom: 28px;
     right: 0;
     width: 38px;
     pointer-events: none;
@@ -953,29 +953,57 @@
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
+    /* hide native scrollbar — we use custom one below */
+    scrollbar-width: none;
   }
-  /* Desktop / Chrome / iOS Safari (when active) */
-  .scroll-table-inner::-webkit-scrollbar {
-    height: 9px;
-    -webkit-appearance: none;
+  .scroll-table-inner::-webkit-scrollbar { display: none; }
+
+  /* ===== 自定义常驻横向滚动条(表格下方) ===== */
+  .custom-scrollbar {
+    position: relative;
+    height: 14px;
+    margin: 10px 4px 0;
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.14) 0%, rgba(212, 175, 55, 0.20) 100%);
+    border-radius: 9px;
+    box-shadow: inset 0 1px 3px rgba(60,40,10,0.10), inset 0 -1px 0 rgba(255,255,255,0.4);
+    cursor: pointer;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
-  .scroll-table-inner::-webkit-scrollbar-track {
-    background: rgba(212, 175, 55, 0.18);
-    border-radius: 6px;
-    margin: 0 12px;
-  }
-  .scroll-table-inner::-webkit-scrollbar-thumb {
+  .custom-scrollbar-thumb {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 10px;
+    width: 30%;
+    min-width: 50px;
     background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
     border-radius: 6px;
-    border: 1.5px solid rgba(255, 255, 255, 0.4);
-    min-width: 60px;
+    box-shadow: 0 1px 3px rgba(60,40,10,0.25), inset 0 1px 0 rgba(255,255,255,0.35);
+    cursor: grab;
+    transition: background 0.2s;
+    will-change: transform, width;
   }
-  /* Firefox */
-  .scroll-table-inner {
-    scrollbar-color: #d4af37 rgba(212, 175, 55, 0.18);
-    scrollbar-width: thin;
+  .custom-scrollbar-thumb::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px;
+    height: 2px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 2px;
+    box-shadow: 0 -3px 0 rgba(255,255,255,0.45), 0 3px 0 rgba(255,255,255,0.45);
   }
+  .custom-scrollbar:hover .custom-scrollbar-thumb,
+  .custom-scrollbar.dragging .custom-scrollbar-thumb {
+    background: linear-gradient(135deg, #b8860b 0%, #8a6308 100%);
+  }
+  .custom-scrollbar.dragging { cursor: grabbing; }
+  .custom-scrollbar.dragging .custom-scrollbar-thumb { cursor: grabbing; }
 
   /* 留资弹窗(强制必填 — 不填不让关) */
   .plan-modal {
@@ -1292,6 +1320,7 @@
           </tbody>
         </table>
       </div>
+      <div class="custom-scrollbar"><div class="custom-scrollbar-thumb"></div></div>
       </div>
 
       <!-- 哪个国家代孕方案更适合我? -->
@@ -1429,6 +1458,7 @@
           </tbody>
         </table>
       </div>
+      <div class="custom-scrollbar"><div class="custom-scrollbar-thumb"></div></div>
       </div>
 
       <div style="margin-top: 24px; padding: 24px 28px; background: linear-gradient(180deg, #fffbee 0%, #f8f3e8 100%); border-left: 4px solid #d4af37; border-radius: 8px; line-height: 1.95; color: #2c2418; font-size: 16px;">
@@ -1820,19 +1850,91 @@
     }
   }
 
-  // ============ 横向滚动表格 — 到末尾时隐藏右侧渐变 ============
+  // ============ 横向滚动表格 — 自定义常驻滚动条 + 渐变反馈 ============
   (function setupScrollTables(){
     function bindWrap(wrap){
       const inner = wrap.querySelector('.scroll-table-inner');
+      const bar   = wrap.querySelector('.custom-scrollbar');
+      const thumb = wrap.querySelector('.custom-scrollbar-thumb');
       if (!inner) return;
-      function updateFade(){
-        const remaining = inner.scrollWidth - inner.clientWidth - inner.scrollLeft;
+
+      function update(){
+        const sw = inner.scrollWidth;
+        const cw = inner.clientWidth;
+        const ratio = cw / sw;
+        // 渐变阴影:滑到底就隐藏
+        const remaining = sw - cw - inner.scrollLeft;
         if (remaining < 8) wrap.classList.add('at-end');
         else wrap.classList.remove('at-end');
+        // 滚动条
+        if (!bar || !thumb) return;
+        if (ratio >= 0.999) {
+          bar.style.display = 'none';
+          return;
+        }
+        bar.style.display = '';
+        const barW = bar.clientWidth;
+        const thumbW = Math.max(50, Math.round(barW * ratio));
+        const maxScroll = sw - cw;
+        const scrollRatio = maxScroll > 0 ? inner.scrollLeft / maxScroll : 0;
+        const maxLeft = barW - thumbW;
+        thumb.style.width = thumbW + 'px';
+        thumb.style.transform = 'translateX(' + (scrollRatio * maxLeft) + 'px)';
       }
-      inner.addEventListener('scroll', updateFade, { passive: true });
-      window.addEventListener('resize', updateFade);
-      updateFade();
+
+      inner.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+
+      // 拖动 thumb
+      if (bar && thumb) {
+        let dragging = false, startX = 0, startScroll = 0;
+        function getX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+        function start(e){
+          dragging = true;
+          bar.classList.add('dragging');
+          startX = getX(e);
+          startScroll = inner.scrollLeft;
+          if (e.cancelable) e.preventDefault();
+        }
+        function move(e){
+          if (!dragging) return;
+          const dx = getX(e) - startX;
+          const barW = bar.clientWidth;
+          const thumbW = thumb.clientWidth;
+          const maxLeft = barW - thumbW;
+          if (maxLeft <= 0) return;
+          const scrollRatio = dx / maxLeft;
+          const maxScroll = inner.scrollWidth - inner.clientWidth;
+          inner.scrollLeft = startScroll + scrollRatio * maxScroll;
+        }
+        function end(){
+          dragging = false;
+          bar.classList.remove('dragging');
+        }
+        thumb.addEventListener('mousedown', start);
+        thumb.addEventListener('touchstart', start, { passive: false });
+        // 点 bar 空白处也跳转
+        bar.addEventListener('mousedown', function(e){
+          if (e.target === thumb) return;
+          const rect = bar.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const barW = bar.clientWidth;
+          const thumbW = thumb.clientWidth;
+          const target = (x - thumbW / 2) / (barW - thumbW);
+          const maxScroll = inner.scrollWidth - inner.clientWidth;
+          inner.scrollLeft = Math.max(0, Math.min(maxScroll, target * maxScroll));
+        });
+        document.addEventListener('mousemove', move);
+        document.addEventListener('touchmove', move, { passive: true });
+        document.addEventListener('mouseup', end);
+        document.addEventListener('touchend', end);
+      }
+
+      // 初始化一次
+      update();
+      // 字体/图片加载后再算一次,防止 scrollWidth 未稳
+      setTimeout(update, 300);
+      setTimeout(update, 1200);
     }
     function init(){
       document.querySelectorAll('.scroll-table-wrap').forEach(bindWrap);
