@@ -1183,7 +1183,7 @@ twq('config','rdinf');
               <div class="contact-label">📞 电话</div>
               <div class="phone-num">198 7804 3732</div>
               <div class="phone-btn-row">
-                <a href="tel:19878043732" class="phone-btn call">
+                <a href="tel:19878043732" class="phone-btn call" onclick="trackPhoneCall()">
                   <span>📞</span><span>拨打</span>
                 </a>
                 <button class="phone-btn" onclick="copyPhone()">
@@ -1677,13 +1677,17 @@ twq('config','rdinf');
   function fireConversion(label) {
     const txnId = 'lp_wechat_' + label + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
     if (window.gtag) {
+      const isFormSubmit = label === 'plan_submit';
       gtag('event', 'conversion', {
-        'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+        'send_to': isFormSubmit
+          ? 'AW-18163080541/lr-yCM-rma0cEN266tRD'
+          : 'AW-18163080541/C2VsCNWrma0cEN266tRD',
         'value': 1.0,
         'currency': 'USD',
         'transaction_id': txnId
       });
-      gtag('event', 'generate_lead', {
+      gtag('event', isFormSubmit ? 'generate_lead' : 'contact_intent', {
+        send_to: 'G-PJ0KE3HLJF',
         event_category: 'engagement',
         event_label: 'wechat_landing_' + label,
         transaction_id: txnId
@@ -1734,7 +1738,9 @@ twq('config','rdinf');
 
   // ============ 获取代孕方案 — 强制留资弹窗(不填不让关) ============
   function getPlan() {
-    fireConversion('plan_modal_open');
+    if (window.gtag) {
+      gtag('event', 'form_open', { send_to: 'G-PJ0KE3HLJF', form_id: 'planModal' });
+    }
     openPlanModal();
   }
   function openPlanModal() {
@@ -1774,6 +1780,7 @@ twq('config','rdinf');
   async function submitPlanForm() {
     const input = document.getElementById('planContactInput');
     const btn = document.getElementById('planSubmitBtn');
+    if (btn.disabled) return;
     const v = (input.value || '').trim();
     if (!v) {
       input.style.borderColor = '#e44';
@@ -1788,7 +1795,6 @@ twq('config','rdinf');
     }
     btn.disabled = true;
     btn.innerHTML = '提交中…';
-    fireConversion('plan_submit');
 
     // 检测联系方式类型(用于邮件标题)
     let kind = '微信';
@@ -1814,7 +1820,11 @@ twq('config','rdinf');
           _captcha: 'false'
         })
       });
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
+      if (!res.ok || !(data.success === true || data.success === 'true')) {
+        throw new Error('Form submission was not accepted');
+      }
+      fireConversion('plan_submit');
       btn.innerHTML = '✓ 已提交';
       showToast('✓ 已收到!Mandy 顾问 5 分钟内联系您');
       setTimeout(() => {
@@ -1826,7 +1836,7 @@ twq('config','rdinf');
     } catch (e) {
       btn.disabled = false;
       btn.innerHTML = '立即获取方案 ➤';
-      showToast('网络异常,请直接加微信 ATR20188');
+      showToast('提交未成功,请重试或直接加微信 ATR20188');
     }
   }
 
@@ -1844,8 +1854,12 @@ twq('config','rdinf');
     const text = '19878043732';
     const msg = '✓ 电话 198 7804 3732 已复制';
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(fb);
+      navigator.clipboard.writeText(text).then(onCopied).catch(fb);
     } else { fb(); }
+    function onCopied() {
+      showToast(msg);
+      fireConversion('phone_copy');
+    }
     function fb() {
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -1853,8 +1867,10 @@ twq('config','rdinf');
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); showToast(msg); }
-      catch(e) { alert('请手动复制: ' + text); }
+      try {
+        if (!document.execCommand('copy')) throw new Error('Copy failed');
+        onCopied();
+      } catch(e) { alert('请手动复制: ' + text); }
       document.body.removeChild(ta);
     }
   }
