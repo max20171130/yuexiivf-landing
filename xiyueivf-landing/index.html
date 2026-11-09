@@ -904,7 +904,23 @@
       }
     });
 
-    function submitQuiz() {
+    async function sendLeadForm(formData, button) {
+      button.disabled = true;
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData });
+        const result = await response.json();
+        if (!response.ok || result.success !== true) throw new Error('Form submission was not accepted');
+        return true;
+      } catch (error) {
+        button.disabled = false;
+        showToast('提交未成功,请重试或直接加微信 ATR20188');
+        return false;
+      }
+    }
+
+    async function submitQuiz() {
+      const button = document.getElementById('submitQuiz');
+      if (button.disabled) return;
       const contactInput = document.getElementById('contactInput');
       const contact = contactInput.value.trim();
       const errorTip = document.getElementById('contactErrorTip');
@@ -960,10 +976,7 @@
         '联系方式: ' + (contact || '(未填)')
       );
 
-      fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(d => console.log('Web3Forms 响应', d))
-        .catch(e => console.error('Web3Forms error', e));
+      if (!await sendLeadForm(fd, button)) return;
 
       const payload = {
         '性别身份': answers.gender || '',
@@ -984,7 +997,7 @@
           transaction_id: txnId
         });
         gtag('event', 'conversion', {
-          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'send_to': 'AW-18163080541/lr-yCM-rma0cEN266tRD',
           'value': 1.0,
           'currency': 'USD',
           'transaction_id': txnId
@@ -1016,7 +1029,9 @@
     function closeContactModal() {
       document.getElementById('contactModal').classList.remove('show');
     }
-    function submitContactModal() {
+    async function submitContactModal() {
+      const button = document.querySelector('#contactModal .contact-modal-submit');
+      if (button.disabled) return;
       const input = document.getElementById('contactModalInput');
       const contact = input.value.trim();
       if (!contact) {
@@ -1047,21 +1062,22 @@
         '⏰ 时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }) + '\n' +
         '🖥️ 设备: ' + navigator.userAgent.slice(0, 80)
       );
+      if (!await sendLeadForm(fd, button)) return;
       exitPending = null;
-      fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd })
-        .catch(e => console.error('Web3Forms error', e));
 
       // Google Ads 转化
       const txnId = 'lp_modal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
       if (window.gtag) {
         gtag('event', 'generate_lead', { event_category: 'form', event_label: 'modal', transaction_id: txnId });
         gtag('event', 'conversion', {
-          'send_to': 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          'send_to': 'AW-18163080541/lr-yCM-rma0cEN266tRD',
           'value': 1.0, 'currency': 'USD', 'transaction_id': txnId
         });
       }
 
       closeContactModal();
+      input.value = '';
+      button.disabled = false;
       showToast('已收到 ✓ Mandy 顾问 5 分钟内联系您');
     }
 
@@ -1213,6 +1229,13 @@
 
     // ============ 拨打电话 ============
     function callPhone(num) {
+      if (window.gtag) {
+        gtag('event', 'conversion', {
+          send_to: 'AW-18163080541/C2VsCNWrma0cEN266tRD',
+          value: 1.0, currency: 'USD',
+          transaction_id: 'lp_phone_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8)
+        });
+      }
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       if (isMobile) {
         window.location.href = 'tel:' + num;
